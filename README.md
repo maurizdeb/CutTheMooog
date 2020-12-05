@@ -16,3 +16,9 @@ The audio chain of the plugin consists on:
   * Resonance pot -> it controls the resonance of the filter, which is the quality factor of the filter.
 * Output section containing:
   * Output pot -> it controls the amount of output signal between -inf dB and 6dB 
+
+Download MacOs:
+ * [AU plugin](https://drive.google.com/file/d/1XQ-GUD1Uct5Nj8GgcomuknelBUhV0LlY/view?usp=sharing)
+ * [VST3 plugin](https://drive.google.com/file/d/1NyVsJI8lic2pUzNPlhSK2jJP35dK4Dl-/view?usp=sharing)
+Download Windows:
+ * [VST3 plugin](https://drive.google.com/file/d/1C9tEbbMYWbZ64DJOAvStBBT1B0M1zMoR/view?usp=sharing)
