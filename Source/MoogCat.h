@@ -27,10 +27,6 @@ private:
     SmoothedValue<SampleType, ValueSmoothingTypes::Multiplicative> cutoffSmoother;
     SmoothedValue<SampleType, ValueSmoothingTypes::Linear> resonanceSmoother, morphingSmoother;
     
-    //State-Space matrices
-    SampleType A[4][4];// = {0}
-    SampleType B[4];// = {0};
-    SampleType C[4];// = {0};
     
     //vector of states
     static constexpr size_t numStates = 4;
@@ -40,10 +36,6 @@ private:
     
     //State-space matrices initialization
     void updateSmoothersAndStateSpace();
-    void init_A(SampleType pow_g_2, SampleType pow_g_3, SampleType pow_g_4, SampleType pow_r_cat_2);
-    void init_B(SampleType pow_g_2, SampleType pow_g_3, SampleType pow_g_4, SampleType pow_r_cat_2);
-    void init_C(SampleType pow_g_2, SampleType pow_g_3, SampleType pow_g_4, SampleType pow_r_cat_2);
-    void setFilterMatrices();
     
     SampleType resonanceMap(SampleType resonance) {return jmap(resonance, SampleType(0), SampleType(0.99));}
     SampleType filterTypeMap(SampleType map) {return jmap(map, SampleType(0.4), SampleType(1.5)); }

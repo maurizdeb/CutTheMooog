@@ -73,7 +73,7 @@ private:
     void updateSmoothers();
     SampleType currentFold, fold, currentOffset, offset;
     SampleType foldMapping(SampleType x){return jmap(x, SampleType(1), SampleType(10));};
-    SampleType offsetMapping(SampleType x){return jmap(x, SampleType(0), SampleType(0.8));};
+    SampleType offsetMapping(SampleType x){return jmap(x, SampleType(0), SampleType(5));};
     dsp::LookupTableTransform<SampleType> tanhLUT { [] (SampleType x) { return std::tanh (x); },
                                                          SampleType (-5), SampleType (5), 256 };
     
