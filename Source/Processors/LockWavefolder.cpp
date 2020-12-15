@@ -19,10 +19,13 @@ LockWavefolder<SampleType>::LockWavefolder(): oversampler(2,2,dsp::Oversampling<
 
 template <typename SampleType>
 void LockWavefolder<SampleType>::prepare(const juce::dsp::ProcessSpec &spec){
-    setSampleRate(spec.sampleRate*4); //oversampling factor of 4 = 2^2
+    setSampleRate(spec.sampleRate); //oversampling factor of 4 = 2^2
     foldSmoother.reset(sampleRate, SampleType(0.05));
     offsetSmoother.reset(sampleRate, SampleType(0.05));
     mixer.prepare(spec);
+    
+    dcBlockers[0].prepare(sampleRate, 30.0f);
+    dcBlockers[1].prepare(sampleRate, 30.0f);
     reset();
 }
 
@@ -32,12 +35,17 @@ void LockWavefolder<SampleType>::reset(){
     foldSmoother.setCurrentAndTargetValue(fold);
     offsetSmoother.setCurrentAndTargetValue(offset);
     mixer.reset();
+    dcBlockers[0].reset();
+    dcBlockers[1].reset();
 }
 
 template <typename SampleType>
 void LockWavefolder<SampleType>::initWavefolder(size_t samplesPerBlock, SampleType startingFold, SampleType startingOffset){
     
     oversampler.initProcessing(samplesPerBlock);
+    
+    mixer.setWetLatency(oversampler.getLatencyInSamples());
+    
     fold = startingFold;
     currentFold = foldMapping(fold);
     foldSmoother.setCurrentAndTargetValue(currentFold);
@@ -45,6 +53,11 @@ void LockWavefolder<SampleType>::initWavefolder(size_t samplesPerBlock, SampleTy
     offset = startingOffset;
     currentOffset = offsetMapping(offset);
     offsetSmoother.setCurrentAndTargetValue(currentOffset);
+}
+
+template <typename SampleType>
+SampleType LockWavefolder<SampleType>::getLatency(){
+    return oversampler.getLatencyInSamples();
 }
 
 template <typename SampleType>
@@ -98,7 +111,7 @@ SampleType LockWavefolder<SampleType>::processSampleLWFOneStage(SampleType input
 }
 
 template <typename SampleType>
-SampleType LockWavefolder<SampleType>::processSample(SampleType input){
+SampleType LockWavefolder<SampleType>::processSample(SampleType input, size_t channel){
     
     const auto val1 = (currentFold*input + currentOffset);
     const auto input_stage1 = val1/SampleType(3);

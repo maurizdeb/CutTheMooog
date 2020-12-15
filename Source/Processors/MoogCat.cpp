@@ -111,10 +111,10 @@ template <typename SampleType>
 //channel to be processed
 SampleType MoogCat<SampleType>::processSample(SampleType input, size_t channel){
     auto& s = state[channel];
-    const auto den = ((g*g+1)*(g*g+1) + g*r_cat*(res*r_cat*g*g*g + 4*g*g + 4*r_cat*g + 4));
+    const auto den = (4*res*g*g*g*g*r_cat*r_cat + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat + 2*g*g + 4*g*r_cat + 1);
     SampleType out = (g*g*g*s[0] - g*g*(2*g*r_cat + 1)*s[1] + g*(g*g + 2*g*r_cat + 1)*s[2] - (2*g*g*g*r_cat + 4*g*g*r_cat*r_cat + g*g + 4*g*r_cat + 1)*s[3])/den;
-    const auto a = -(res*g*g*g*g*r_cat*r_cat*4 + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat - 1)*s[0] + 2*g*(res*g*g*r_cat*r_cat*4 + g*g + 2*g*r_cat + 1)*s[1] - 8*g*g*res*r_cat*r_cat*s[2] + g*res*r_cat*r_cat*(2*g*r_cat+1)*8*s[3] + g*(g*g + r_cat*2*g + 1)*2*input;
-    const auto b = - g*(g*g + r_cat*2*g + 1)*2*s[0] + (-res*g*g*g*g*r_cat*r_cat*4 - g*g*g*g + 4*g*g*r_cat*r_cat + 4*g*r_cat + 1)*s[1] + 8*g*g*g*res*r_cat*r_cat*s[2] - g*g*res*r_cat*r_cat*(2*g*r_cat+1)*8*s[3] - g*g*(g*g + r_cat*2*g + 1)*2*input;
+    const auto a = -(res*g*g*g*g*r_cat*r_cat*4 + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat - 1)*s[0] + 2*g*(res*g*g*r_cat*r_cat*4 + g*g + 2*g*r_cat + 1)*s[1] - 8*g*g*res*r_cat*r_cat*s[2] + 8*g*res*r_cat*r_cat*(2*g*r_cat+1)*s[3] + g*(g*g + r_cat*2*g + 1)*2*input;
+    const auto b = - 2*g*(g*g + r_cat*2*g + 1)*s[0] + (-res*g*g*g*g*r_cat*r_cat*4 - g*g*g*g + 4*g*g*r_cat*r_cat + 4*g*r_cat + 1)*s[1] + 8*g*g*g*res*r_cat*r_cat*s[2] - 8*g*g*res*r_cat*r_cat*(2*g*r_cat+1)*s[3] - g*g*(g*g + r_cat*2*g + 1)*2*input;
     const auto c = 2*g*g*s[0] - g*(2*g*r_cat + 1)*2*s[1] - (res*g*g*g*g*r_cat*r_cat*4 + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat - 1)*s[2] + 2*g*(res*g*g*r_cat*r_cat*4 + g*g + 2*g*r_cat + 1)*s[3] + 2*g*g*g*input;
     const auto d = -2*g*g*g*s[0] + g*g*(2*g*r_cat + 1)*2*s[1] - g*(g*g + r_cat*2*g + 1)*2*s[2] + (-res*g*g*g*g*r_cat*r_cat*4 - g*g*g*g + 4*g*g*r_cat*r_cat + 4*g*r_cat + 1)*s[3] - 2*g*g*g*g*input;
     s[0] = a/den;

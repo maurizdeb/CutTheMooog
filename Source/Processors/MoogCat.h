@@ -40,6 +40,8 @@ private:
     SampleType resonanceMap(SampleType resonance) {return jmap(resonance, SampleType(0), SampleType(0.99));}
     SampleType filterTypeMap(SampleType map) {return jmap(map, SampleType(0.4), SampleType(1.5)); }
     
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MoogCat);
+    
 public:
     
     //constructor and destructor methods

@@ -32,7 +32,8 @@ CutTheMoogAudioProcessor::CutTheMoogAudioProcessor()
                             std::make_unique<AudioParameterFloat>(FOLDING_ID, FOLDING_NAME, NormalisableRange<float>(0, 1, 0.001), 0.5),
                             std::make_unique<AudioParameterFloat>(OFFSET_ID, OFFSET_NAME, NormalisableRange<float>(0, 1, 0.001), 0.0),
                             std::make_unique<AudioParameterFloat>(TRIM_ID, TRIM_NAME, -24.0f, 24.0f, 0.0f),
-                            std::make_unique<AudioParameterFloat>(DRYWET_ID, DRYWET_NAME, 0.0f, 1.0f, 0.5f)
+                            std::make_unique<AudioParameterFloat>(DRYWET_ID, DRYWET_NAME, 0.0f, 1.0f, 0.5f),
+                            std::make_unique<AudioParameterBool>(BYPASS_ID, BYPASS_NAME, true)
                         })
 #endif
 {
@@ -126,21 +127,17 @@ void CutTheMoogAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     spec.sampleRate = sampleRate;
     spec.maximumBlockSize = samplesPerBlock;
     spec.numChannels = getMainBusNumOutputChannels();
-    //filterMoogCat.prepare(spec);
-    //lockFolder.prepare(spec);
+    
+    delayLine.prepare(spec);
     processorChain.prepare(spec);
     
-    //update of the filter
-    //Get and update treeStateValues
     initTrimParams();
     initFolderParams(samplesPerBlock);
     initFilterParams();
     initOutput();
-    //oldGain = *currentGain;
-    
-    
-    // Reset the filter states
-    //filterMoogCat.reset();
+    delayLine.setDelay(getLatency());
+    setLatencySamples(roundToInt(getLatency()));
+    bypass.prepare(spec, true, getLatency());
     analyser->prepareToPlay (sampleRate, samplesPerBlock);
 }
 
@@ -177,32 +174,29 @@ bool CutTheMoogAudioProcessor::isBusesLayoutSupported (const BusesLayout& layout
 void CutTheMoogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuffer& midiMessages)
 {
     ScopedNoDenormals noDenormals;
-    auto totalNumInputChannels  = getTotalNumInputChannels();
-    auto totalNumOutputChannels = getTotalNumOutputChannels();
-    //int bufferLength = buffer.getNumSamples();
-
-    // In case we have more outputs than inputs, this code clears any output
-    // channels that didn't contain input data, (because these aren't
-    // guaranteed to be empty - they may contain garbage).
-    // This is here to avoid people getting screaming feedback
-    // when they first compile a plugin, but obviously you don't need to keep
-    // this code if your algorithm always overwrites all the output channels.
-    for (auto i = totalNumInputChannels; i < totalNumOutputChannels; ++i)
-        buffer.clear (i, 0, buffer.getNumSamples());
-    
     
     updateTrimParams();
     updateFolderParams();
     updateFilterParams();
     updateOutputParams();
-        
+    auto bypassParam = treeState.getRawParameterValue(BYPASS_ID);
+    if (! bypass.processBlockIn(buffer, *bypassParam)){
+        analyser -> pushSamples(buffer);
+        return;
+    }
     dsp::AudioBlock<float> block(buffer);
-    //lockFolder.process(dsp::ProcessContextReplacing<float> (block));
-    //filterMoogCat.process(dsp::ProcessContextReplacing<float> (block));
     processorChain.process(dsp::ProcessContextReplacing<float> (block));
-    
+    bypass.processBlockOut(buffer, *bypassParam);
     analyser -> pushSamples(buffer);
     
+}
+
+void CutTheMoogAudioProcessor::processBlockBypassed(AudioBuffer<float> & buffer, MidiBuffer & midiMessages){
+    
+    ScopedNoDenormals noDenormals;
+    
+    dsp::AudioBlock<float> block(buffer);
+    delayLine.process(dsp::ProcessContextReplacing<float> (block));
 }
 
 //==============================================================================
@@ -214,7 +208,12 @@ bool CutTheMoogAudioProcessor::hasEditor() const
 AudioProcessorEditor* CutTheMoogAudioProcessor::createEditor()
 {
     //return new CutTheMoogAudioProcessorEditor (*this, treeState);
-    return new foleys::MagicPluginEditor(magicState, BinaryData::CutTheMoog_xml, BinaryData::CutTheMoog_xmlSize);
+    auto builder = std::make_unique<foleys::MagicGUIBuilder>(magicState);
+    builder->registerJUCEFactories();
+
+    builder->registerFactory ("PowerButton", &PowerButtonItem::factory);
+    builder->registerLookAndFeel("Skeuomorphic", std::make_unique<foleys::Skeuomorphic>());
+    return new foleys::MagicPluginEditor(magicState, BinaryData::CutTheMoog1_xml, BinaryData::CutTheMoog1_xmlSize, std::move(builder));
 }
 
 //==============================================================================
@@ -339,6 +338,11 @@ void CutTheMoogAudioProcessor::updateTrimParams(){
         trimShouldUpdate = false;
     }
     
+}
+
+float CutTheMoogAudioProcessor::getLatency(){
+    auto& folderProc = processorChain.template get<folderIndex>();
+    return folderProc.getLatency();
 }
 
 //==============================================================================

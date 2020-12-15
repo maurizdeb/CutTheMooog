@@ -25,10 +25,14 @@
 #define TRIM_NAME "Trim"
 #define DRYWET_ID "drywet"
 #define DRYWET_NAME "DryWet"
+#define BYPASS_ID "bypass"
+#define BYPASS_NAME "Bypass"
 
 #include <JuceHeader.h>
-#include "MoogCat.h"
-#include "LockWavefolder.h"
+#include "Processors/MoogCat.h"
+#include "Processors/LockWavefolder.h"
+#include "Processors/BypassProcessor.h"
+#include "PowerButton.h"
 
 //==============================================================================
 /**
@@ -52,6 +56,7 @@ public:
    #endif
 
     void processBlock (AudioBuffer<float>&, MidiBuffer&) override;
+    void processBlockBypassed (AudioBuffer<float>&, MidiBuffer&) override;
 
     //==============================================================================
     AudioProcessorEditor* createEditor() override;
@@ -87,6 +92,8 @@ private:
     
     // state of the parameters: cutoff frequency and resonance
     AudioProcessorValueTreeState treeState;
+    foleys::MagicProcessorState magicState { *this, treeState };
+    foleys::MagicPlotSource* analyser = nullptr;
     
     enum {
         trimIndex,
@@ -96,7 +103,9 @@ private:
     };
     
     juce::dsp::ProcessorChain<juce::dsp::Gain<float>,LockWavefolder<float>, MoogCat<float>, juce::dsp::Gain<float>> processorChain;
-    LockWavefolder<float> lockFolder;
+    dsp::DelayLine<float, dsp::DelayLineInterpolationTypes::Thiran> delayLine{20};
+    BypassProcessor bypass;
+    float getLatency();
     
     std::atomic<bool> filterShouldUpdate {false};
     std::atomic<bool> gainShouldUpdate {false};
@@ -116,9 +125,6 @@ private:
     
     void initTrimParams();
     void updateTrimParams();
-    
-    foleys::MagicProcessorState magicState { *this, treeState };
-    foleys::MagicPlotSource* analyser = nullptr;
     
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CutTheMoogAudioProcessor)

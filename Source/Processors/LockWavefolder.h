@@ -11,6 +11,7 @@
 #pragma once
 #include <JuceHeader.h>
 #include "LWSolver.h"
+#include "DCBlocker.h"
 
 template <typename SampleType>
 class LockWavefolder{
@@ -21,6 +22,7 @@ public:
     void prepare(const juce::dsp::ProcessSpec& spec);
     void reset();
     void initWavefolder(size_t samplesPerBlock, SampleType startingFold, SampleType startingOffset);
+    SampleType getLatency();
     
     template <typename ProcessContext>
     void process(const ProcessContext& context){
@@ -32,7 +34,6 @@ public:
         }
         
         const auto& inputBlock = context.getInputBlock();
-        mixer.setWetLatency(SampleType(0));
         mixer.pushDrySamples(inputBlock);
         auto ovBlock = oversampler.processSamplesUp(inputBlock);
         dsp::ProcessContextReplacing<SampleType> foldingContext(ovBlock);
@@ -46,10 +47,13 @@ public:
             updateSmoothers();
                     
             for (size_t ch = 0; ch < numChannels; ++ch)
-                foldingOutputBlock.getChannelPointer (ch)[n] = processSample (foldingInputBlock.getChannelPointer (ch)[n]);
+                foldingOutputBlock.getChannelPointer (ch)[n] = processSample (foldingInputBlock.getChannelPointer (ch)[n], ch);
         }
         auto& outputBlock = context.getOutputBlock();
         oversampler.processSamplesDown(outputBlock);
+        for (int ch = 0; ch < numChannels; ++ch){
+            dcBlockers[ch].processBlock(outputBlock.getChannelPointer (ch), (int) context.getOutputBlock().getNumSamples());
+        }
         mixer.mixWetSamples(outputBlock);
     };
     
@@ -75,9 +79,14 @@ private:
     SampleType foldMapping(SampleType x){return jmap(x, SampleType(1), SampleType(10));};
     SampleType offsetMapping(SampleType x){return jmap(x, SampleType(0), SampleType(5));};
     dsp::LookupTableTransform<SampleType> tanhLUT { [] (SampleType x) { return std::tanh (x); },
-                                                         SampleType (-5), SampleType (5), 256 };
+                                                         SampleType (-6), SampleType (6), 256 };
     
-    dsp::DryWetMixer<SampleType> mixer { 10 };
+    dsp::DryWetMixer<SampleType> mixer { 20 };
+    
+    //vector of states
+    DCBlocker dcBlockers[2];
+    
+    SampleType refl, k; //filter coefficients DC blocker
     
     
     SampleType processSampleLWFOneStage(SampleType input);
@@ -94,9 +103,9 @@ private:
         }
     };
     
-    
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LockWavefolder);
 protected:
     
-    SampleType processSample(SampleType input);
+    SampleType processSample(SampleType input, size_t channel);
     
 };

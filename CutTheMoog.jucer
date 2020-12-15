@@ -4,21 +4,31 @@
               displaySplashScreen="1" jucerFormatVersion="1">
   <MAINGROUP id="awbd8A" name="CutTheMoog">
     <GROUP id="{5A40FCF0-84E4-C3C2-BFE1-EC2C48F7F36F}" name="Resources">
+      <FILE id="wqDfXh" name="powerswitch.svg" compile="0" resource="1" file="Resources/powerswitch.svg"/>
+      <FILE id="hoMGOY" name="CutTheMoog1.xml" compile="0" resource="1" file="Resources/CutTheMoog1.xml"/>
       <FILE id="sAth7D" name="CutTheMoog.xml" compile="0" resource="1" file="Resources/CutTheMoog.xml"/>
     </GROUP>
     <GROUP id="{3D6D0CDE-3F95-3CD8-4B9A-03A7EC5AC5AD}" name="Source">
-      <FILE id="lkTbI6" name="LockWavefolder.cpp" compile="1" resource="0"
-            file="Source/LockWavefolder.cpp"/>
-      <FILE id="UNBnY8" name="LockWavefolder.h" compile="0" resource="0"
-            file="Source/LockWavefolder.h"/>
-      <FILE id="BKBNp6" name="LWSolver.cpp" compile="1" resource="0" file="Source/LWSolver.cpp"/>
-      <FILE id="d7azy0" name="LWSolver.h" compile="0" resource="0" file="Source/LWSolver.h"/>
-      <FILE id="ReVgXn" name="MoogCat.cpp" compile="1" resource="0" file="Source/MoogCat.cpp"/>
-      <FILE id="yt6lkG" name="MoogCat.h" compile="0" resource="0" file="Source/MoogCat.h"/>
+      <GROUP id="{DD1CB46E-48EB-E3F8-6E18-14DD3AAB0C1A}" name="Processors">
+        <FILE id="RTsIKQ" name="DCBlocker.h" compile="0" resource="0" file="Source/Processors/DCBlocker.h"/>
+        <FILE id="IixsAz" name="MyIIRFilter.h" compile="0" resource="0" file="Source/Processors/MyIIRFilter.h"/>
+        <FILE id="Yxi23C" name="LockWavefolder.cpp" compile="1" resource="0"
+              file="Source/Processors/LockWavefolder.cpp"/>
+        <FILE id="XqCqT3" name="LockWavefolder.h" compile="0" resource="0"
+              file="Source/Processors/LockWavefolder.h"/>
+        <FILE id="QGUqI9" name="LWSolver.cpp" compile="1" resource="0" file="Source/Processors/LWSolver.cpp"/>
+        <FILE id="CYfUbD" name="LWSolver.h" compile="0" resource="0" file="Source/Processors/LWSolver.h"/>
+        <FILE id="ZMczLP" name="MoogCat.cpp" compile="1" resource="0" file="Source/Processors/MoogCat.cpp"/>
+        <FILE id="uGbLV4" name="MoogCat.h" compile="0" resource="0" file="Source/Processors/MoogCat.h"/>
+        <FILE id="JJ0UaA" name="BypassProcessor.h" compile="0" resource="0"
+              file="Source/Processors/BypassProcessor.h"/>
+      </GROUP>
       <FILE id="yp2M0b" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="hYxsSg" name="PluginProcessor.h" compile="0" resource="0"
             file="Source/PluginProcessor.h"/>
+      <FILE id="rOXhT2" name="PowerButton.cpp" compile="1" resource="0" file="Source/PowerButton.cpp"/>
+      <FILE id="XzXvTU" name="PowerButton.h" compile="0" resource="0" file="Source/PowerButton.h"/>
     </GROUP>
   </MAINGROUP>
   <EXPORTFORMATS>
