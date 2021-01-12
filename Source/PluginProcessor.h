@@ -33,6 +33,7 @@
 #include "Processors/LockWavefolder.h"
 #include "Processors/BypassProcessor.h"
 #include "PowerButton.h"
+#include "OtherLookAndFeel.h"
 
 //==============================================================================
 /**

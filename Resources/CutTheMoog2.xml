@@ -36,7 +36,7 @@
              flex-grow="2.5" border="3" border-color="FF30CDE9"/>
       <PowerButton parameter="bypass" background-color="FFCC0DC7" button-color="FF040404"
                    button-on-color="FF30CDE9"/>
-      <Slider caption="TRIM" parameter="trim" lookAndFeel="MYLNF" caption-color="FF30CDE9"
+      <Slider caption="TRIM" parameter="trim" lookAndFeel="Skeuomorphic" caption-color="FF30CDE9"
               rotary-fill="FF30CDE9" slider-text="FF30CDE9" slider-text-background="FFCC0DC7"
               slider-text-highlight="FFCC0DC7" slider-text-outline="FFCC0DC7"
               slider-type="rotary-horizontal-vertical" background-color="FFCC0DC7"
@@ -45,38 +45,44 @@
     <View flex-direction="column" flex-grow="1.2" border-color="" background-color="FFCC0DC7">
       <View background-color="FFCC0DC7" caption="WAVEFOLDER" caption-size="30"
             caption-color="FF30CDE9" border="3" border-color="FF30CDE9">
-        <Slider caption="FOLDING" parameter="folding" lookAndFeel="MYLNF" caption-color="FF30CDE9"
-                background-color="FFCC0DC7" slider-type="rotary-horizontal-vertical"
+        <Slider caption="FOLDING" parameter="folding" lookAndFeel="Skeuomorphic"
+                caption-color="FF30CDE9" background-color="FFCC0DC7" slider-type="rotary-horizontal-vertical"
                 slider-textbox="textbox-below" rotary-fill="FF30CDE9" slider-text="FF30CDE9"
                 slider-text-background="FFCC0DC7" slider-text-highlight="FFCC0DC7"
                 slider-text-outline="FFCC0DC7"/>
-        <Slider caption="OFFSET" parameter="offset" lookAndFeel="MYLNF" caption-color="FF30CDE9"
-                background-color="FFCC0DC7" slider-type="rotary-horizontal-vertical"
+        <Slider caption="OFFSET" parameter="offset" lookAndFeel="Skeuomorphic"
+                caption-color="FF30CDE9" background-color="FFCC0DC7" slider-type="rotary-horizontal-vertical"
                 slider-textbox="textbox-below" rotary-fill="FF30CDE9" slider-text="FF30CDE9"
-                slider-text-outline="FFCC0DC7"/>
+                slider-text-outline="FFCC0DC7" slider-text-highlight="FFCC0DC7"
+                slider-text-background="FFCC0DC7"/>
         <Slider caption="D/W" parameter="drywet" background-color="FFCC0DC7"
-                lookAndFeel="MYLNF" caption-color="FF30CDE9" rotary-fill="FF30CDE9"
-                slider-text-outline="FFCC0DC7" slider-text="FF30CDE9"/>
+                lookAndFeel="Skeuomorphic" caption-color="FF30CDE9" rotary-fill="FF30CDE9"
+                slider-text-outline="FFCC0DC7" slider-text="FF30CDE9" slider-text-background="FFCC0DC7"
+                slider-text-highlight="FFCC0DC7"/>
       </View>
       <View caption="FILTER" caption-size="30" caption-color="FF30CDE9" background-color="FFCC0DC7"
             border="3" border-color="FF30CDE9">
         <Slider caption="CUTOFF" parameter="frequency" caption-color="FF30CDE9"
-                background-color="FFCC0DC7" lookAndFeel="MYLNF" rotary-fill="FF30CDE9"
-                slider-text="FF30CDE9" slider-text-outline="FFCC0DC7"/>
+                background-color="FFCC0DC7" lookAndFeel="Skeuomorphic" rotary-fill="FF30CDE9"
+                slider-text="FF30CDE9" slider-text-outline="FFCC0DC7" slider-text-highlight="FFCC0DC7"
+                slider-text-background="FFCC0DC7"/>
         <Slider caption="MORPH" parameter="morphing" background-color="FFCC0DC7"
-                lookAndFeel="MYLNF" rotary-fill="FF30CDE9" slider-text="FF30CDE9"
-                slider-text-outline="FFCC0DC7" caption-color="FF30CDE9"/>
+                lookAndFeel="Skeuomorphic" rotary-fill="FF30CDE9" slider-text="FF30CDE9"
+                slider-text-outline="FFCC0DC7" caption-color="FF30CDE9" slider-text-highlight="FFCC0DC7"
+                slider-text-background="FFCC0DC7"/>
         <Slider caption="RESONANCE" parameter="resonance" caption-color="FF30CDE9"
-                background-color="FFCC0DC7" lookAndFeel="MYLNF" rotary-fill="FF30CDE9"
-                slider-text-outline="FFCC0DC7" slider-text="FF30CDE9"/>
+                background-color="FFCC0DC7" lookAndFeel="Skeuomorphic" rotary-fill="FF30CDE9"
+                slider-text-outline="FFCC0DC7" slider-text="FF30CDE9" slider-text-highlight="FFCC0DC7"
+                slider-text-background="FFCC0DC7"/>
       </View>
     </View>
     <View background-color="FFCC0DC7" flex-direction="column" flex-wrap="nowrap"
           flex-align-content="stretch" flex-align-items="stretch" flex-justify-content="start">
       <Plot flex-grow="2.5" source="analyser" plot-color="FFCC0DC7" background-color="FF30CDE9"/>
       <Slider caption="OUTPUT" parameter="gain" caption-color="FF30CDE9" background-color="FFCC0DC7"
-              lookAndFeel="MYLNF" slider-type="rotary-horizontal-vertical"
-              rotary-fill="FF30CDE9" slider-text="FF30CDE9" slider-text-outline="FFCC0DC7"/>
+              lookAndFeel="Skeuomorphic" slider-type="rotary-horizontal-vertical"
+              rotary-fill="FF30CDE9" slider-text="FF30CDE9" slider-text-outline="FFCC0DC7"
+              slider-text-background="FFCC0DC7" slider-text-highlight="FFCC0DC7"/>
     </View>
   </View>
 </magic>

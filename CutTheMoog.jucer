@@ -1,10 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<JUCERPROJECT id="aDkQQu" name="CutTheMoog" projectType="audioplug" pluginFormats="buildAU,buildStandalone,buildVST3"
-              displaySplashScreen="1" jucerFormatVersion="1">
+<JUCERPROJECT id="aDkQQu" name="CutTheMoog" projectType="audioplug" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
+              displaySplashScreen="1" jucerFormatVersion="1" pluginManufacturer="karotaSound"
+              companyName="KarotaSound">
   <MAINGROUP id="awbd8A" name="CutTheMoog">
     <GROUP id="{5A40FCF0-84E4-C3C2-BFE1-EC2C48F7F36F}" name="Resources">
       <FILE id="wqDfXh" name="powerswitch.svg" compile="0" resource="1" file="Resources/powerswitch.svg"/>
+      <FILE id="GVdLkB" name="CutTheMoog2.xml" compile="0" resource="1" file="Resources/CutTheMoog2.xml"/>
+      <FILE id="vSFr5N" name="FuturaBoldFont.ttf" compile="0" resource="1"
+            file="Resources/FuturaBoldFont.ttf"/>
+      <FILE id="rvkj94" name="FuturaBookFont.ttf" compile="0" resource="1"
+            file="Resources/FuturaBookFont.ttf"/>
       <FILE id="hoMGOY" name="CutTheMoog1.xml" compile="0" resource="1" file="Resources/CutTheMoog1.xml"/>
       <FILE id="sAth7D" name="CutTheMoog.xml" compile="0" resource="1" file="Resources/CutTheMoog.xml"/>
     </GROUP>
@@ -23,6 +29,8 @@
         <FILE id="JJ0UaA" name="BypassProcessor.h" compile="0" resource="0"
               file="Source/Processors/BypassProcessor.h"/>
       </GROUP>
+      <FILE id="irVVzL" name="OtherLookAndFeel.h" compile="0" resource="0"
+            file="Source/OtherLookAndFeel.h"/>
       <FILE id="yp2M0b" name="PluginProcessor.cpp" compile="1" resource="0"
             file="Source/PluginProcessor.cpp"/>
       <FILE id="hYxsSg" name="PluginProcessor.h" compile="0" resource="0"
