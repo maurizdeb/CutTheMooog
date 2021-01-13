@@ -214,6 +214,7 @@ AudioProcessorEditor* CutTheMoogAudioProcessor::createEditor()
     builder->registerFactory ("PowerButton", &PowerButtonItem::factory);
     builder->registerLookAndFeel("Skeuomorphic", std::make_unique<foleys::Skeuomorphic>());
     builder->registerLookAndFeel("MYLNF", std::make_unique<OtherLookAndFeel>());
+    LookAndFeel::setDefaultLookAndFeel(&myLnf);
     return new foleys::MagicPluginEditor(magicState, BinaryData::CutTheMoog1_xml, BinaryData::CutTheMoog1_xmlSize, std::move(builder));
 }
 
