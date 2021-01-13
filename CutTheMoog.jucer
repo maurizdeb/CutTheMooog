@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="aDkQQu" name="CutTheMoog" projectType="audioplug" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
-              displaySplashScreen="1" jucerFormatVersion="1" pluginManufacturer="karotaSound"
+              displaySplashScreen="1" jucerFormatVersion="1" pluginManufacturer="KarotaSound"
               companyName="KarotaSound">
   <MAINGROUP id="awbd8A" name="CutTheMoog">
     <GROUP id="{5A40FCF0-84E4-C3C2-BFE1-EC2C48F7F36F}" name="Resources">
