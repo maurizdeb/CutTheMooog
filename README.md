@@ -18,10 +18,10 @@ The audio chain of the plugin consists on:
   * Output pot -> it controls the amount of output signal between -60dB and 6dB 
 
 Download MacOS:
- * [AU plugin](https://drive.google.com/uc?export=download&id=1t7XOhLfKfs9A0B_PE5QKvSki-wJATWkt)
- * [VST3 plugin](https://drive.google.com/uc?export=download&id=1CMp5yGGHqb-Guv0PMh_aYp7I3J0WY9CW)
- * [VST plugin](https://drive.google.com/uc?export=download&id=1_7qvVtDvHCKH6W0p8scThafUn21BkFHz)
+ * [AU plugin](https://drive.google.com/uc?export=download&id=1OroDlSELorLpR82vJHPjaWrzzKsgbA8W)
+ * [VST3 plugin](https://drive.google.com/uc?export=download&id=1mCmWtuK-fVcT0dIMtwz-wgD231QbUyB8)
+ * [VST plugin](https://drive.google.com/uc?export=download&id=1_3B7-AkmitZzfMehImO-j-4HgkrvAUio)
 
 Download Windows:
- * [VST3 plugin](https://drive.google.com/uc?export=download&id=17Di-4kJEp9OBpqePahYLQssmkr5jRED-)
- * [VST plugin](https://drive.google.com/uc?export=download&id=1E1Kx-B-GixJNr4jGabfsemkmgXd4naOY)
+ * [VST3 plugin](https://drive.google.com/uc?export=download&id=1Cms3PnxrrzkKDk5a6heP28QUBpxUAanJ)
+ * [VST plugin](https://drive.google.com/uc?export=download&id=1l15Ir1IYiwXwX_kQgIk3VwuQKBnXTn25)
