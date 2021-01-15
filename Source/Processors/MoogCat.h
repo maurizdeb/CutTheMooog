@@ -35,10 +35,10 @@ private:
     void setNumChannels (size_t newValue)   { state.resize (newValue); }
     
     //State-space matrices initialization
-    void updateSmoothersAndStateSpace();
+    void updateSmoothersAndStateSpace() noexcept;
     
-    SampleType resonanceMap(SampleType resonance) {return jmap(resonance, SampleType(0), SampleType(0.99));}
-    SampleType filterTypeMap(SampleType map) {return jmap(map, SampleType(0.4), SampleType(1.5)); }
+    SampleType resonanceMap(SampleType resonance) noexcept {return jmap(resonance, SampleType(0), SampleType(0.99));}
+    SampleType filterTypeMap(SampleType map) noexcept {return jmap(map, SampleType(0.4), SampleType(1.5)); }
     
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(MoogCat);
     
@@ -49,27 +49,27 @@ public:
     ~MoogCat();
     
     //cutoff getter and setter
-    void setCutoffFrequency(SampleType cutoff_frequency);
+    void setCutoffFrequency(SampleType cutoff_frequency) noexcept;
     
     //resonance getter and setter
-    void setResonance(SampleType resonance);
+    void setResonance(SampleType resonance) noexcept;
     
     
     // coeeficient of filter type getter and setter
-    void setFilterType(SampleType r);
+    void setFilterType(SampleType r) noexcept;
     
     
     //sampleRate getter and setter
-    void setSampleRate(SampleType sampleRate);
+    void setSampleRate(SampleType sampleRate) noexcept;
     
     size_t getNumChannels() const noexcept       { return state.size(); }
     
     //initialize the filter
-    void initFilter();
-    void initFilter(SampleType cutoff, SampleType resonance, SampleType type);
+    void initFilter() noexcept;
+    void initFilter(SampleType cutoff, SampleType resonance, SampleType type) noexcept ;
     
     //update the filter
-    void update(SampleType cutoff, SampleType resonance, SampleType type);
+    void update(SampleType cutoff, SampleType resonance, SampleType type) noexcept;
     
     //prepare the filter
     void prepare(const juce::dsp::ProcessSpec& spec);
@@ -78,7 +78,7 @@ public:
     void reset();
     
     template <typename ProcessContext>
-    void process(const ProcessContext& context){
+    void process(const ProcessContext& context) noexcept {
         
         const auto& inputBlock = context.getInputBlock();
         auto outputBlock = context.getOutputBlock();
@@ -106,5 +106,5 @@ protected:
     //filter processing method
     //input to be processed
     //channel to be processed
-    SampleType processSample(SampleType input, size_t channel);
+    SampleType processSample(SampleType input, size_t channel) noexcept;
 };

@@ -56,50 +56,50 @@ void LockWavefolder<SampleType>::initWavefolder(size_t samplesPerBlock, SampleTy
 }
 
 template <typename SampleType>
-SampleType LockWavefolder<SampleType>::getLatency(){
+SampleType LockWavefolder<SampleType>::getLatency() noexcept{
     return oversampler.getLatencyInSamples();
 }
 
 template <typename SampleType>
-SampleType LockWavefolder<SampleType>::getFold(){
+SampleType LockWavefolder<SampleType>::getFold() noexcept {
     return fold;
 }
 
 template <typename SampleType>
-void LockWavefolder<SampleType>::setFold(SampleType folding){
+void LockWavefolder<SampleType>::setFold(SampleType folding) noexcept {
     fold = folding;
     foldSmoother.setTargetValue(foldMapping(fold));
 }
 
 template <typename SampleType>
-SampleType LockWavefolder<SampleType>::getOffset(){
+SampleType LockWavefolder<SampleType>::getOffset() noexcept {
     return offset;
 }
 
 template <typename SampleType>
-void LockWavefolder<SampleType>::setOffset(SampleType inputOffset){
+void LockWavefolder<SampleType>::setOffset(SampleType inputOffset) noexcept {
     offset = inputOffset;
     offsetSmoother.setTargetValue(offsetMapping(offset));
 }
 
 template <typename SampleType>
-void LockWavefolder<SampleType>::setSampleRate(SampleType samplingFreq){
+void LockWavefolder<SampleType>::setSampleRate(SampleType samplingFreq) noexcept {
     sampleRate = samplingFreq;
 }
 
 template <typename SampleType>
-void LockWavefolder<SampleType>::setMixProportion(SampleType mix){
+void LockWavefolder<SampleType>::setMixProportion(SampleType mix) noexcept {
     mixer.setWetMixProportion(mix);
 }
 
 template <typename SampleType>
-void LockWavefolder<SampleType>::updateSmoothers(){
+void LockWavefolder<SampleType>::updateSmoothers() noexcept {
     currentFold = foldSmoother.getNextValue();
     currentOffset = offsetSmoother.getNextValue();
 }
 
 template <typename SampleType>
-SampleType LockWavefolder<SampleType>::processSampleLWFOneStage(SampleType input){
+SampleType LockWavefolder<SampleType>::processSampleLWFOneStage(SampleType input) noexcept {
     const auto sign_in = sign(input);
     const auto delta_log = SampleType(LWSolver::logf_approx(delta));
     const auto inputLambert = delta_log + sign_in*beta*input;
@@ -111,7 +111,7 @@ SampleType LockWavefolder<SampleType>::processSampleLWFOneStage(SampleType input
 }
 
 template <typename SampleType>
-SampleType LockWavefolder<SampleType>::processSample(SampleType input, size_t channel){
+SampleType LockWavefolder<SampleType>::processSample(SampleType input, size_t channel) noexcept{
     
     const auto val1 = (currentFold*input + currentOffset);
     const auto input_stage1 = val1/SampleType(3);
@@ -122,6 +122,11 @@ SampleType LockWavefolder<SampleType>::processSample(SampleType input, size_t ch
     const auto output = output_stage4*SampleType(3);
     
     return tanhLUT(output);
+}
+
+template <typename SampleType>
+void LockWavefolder<SampleType>::releaseResources(){
+    oversampler.reset();
 }
 
 template class LockWavefolder<float>;

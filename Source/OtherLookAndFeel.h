@@ -18,7 +18,7 @@ public:
     
     OtherLookAndFeel(){
         
-        futura = juce::Typeface::createSystemTypefaceFor(BinaryData::FuturaBookFont_ttf, BinaryData::FuturaBookFont_ttfSize);
+        futura = juce::Typeface::createSystemTypefaceFor(BinaryData::FuturaHeavyfont_ttf, BinaryData::FuturaHeavyfont_ttfSize);
         
         futuraBold = juce::Typeface::createSystemTypefaceFor(BinaryData::FuturaBoldFont_ttf, BinaryData::FuturaBoldFont_ttfSize);
         
@@ -88,4 +88,5 @@ private:
     
     juce::Typeface::Ptr futuraBold;
     juce::Typeface::Ptr futura;
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OtherLookAndFeel);
 };

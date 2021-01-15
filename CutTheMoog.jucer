@@ -9,6 +9,8 @@
       <FILE id="GVdLkB" name="CutTheMoog2.xml" compile="0" resource="1" file="Resources/CutTheMoog2.xml"/>
       <FILE id="vSFr5N" name="FuturaBoldFont.ttf" compile="0" resource="1"
             file="Resources/FuturaBoldFont.ttf"/>
+      <FILE id="lWIZOA" name="FuturaHeavyfont.ttf" compile="0" resource="1"
+            file="Resources/FuturaHeavyfont.ttf"/>
       <FILE id="rvkj94" name="FuturaBookFont.ttf" compile="0" resource="1"
             file="Resources/FuturaBookFont.ttf"/>
       <FILE id="hoMGOY" name="CutTheMoog1.xml" compile="0" resource="1" file="Resources/CutTheMoog1.xml"/>

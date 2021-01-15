@@ -145,6 +145,8 @@ void CutTheMoogAudioProcessor::releaseResources()
 {
     // When playback stops, you can use this as an opportunity to free up any
     // spare memory, etc.
+    auto& folder = processorChain.template get<folderIndex>();
+    folder.releaseResources();
 }
 
 #ifndef JucePlugin_PreferredChannelConfigurations

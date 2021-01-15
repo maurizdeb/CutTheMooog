@@ -21,7 +21,7 @@ MoogCat<SampleType>::MoogCat(): state(2){
     fc = SampleType(800);
     res = SampleType(0);
     r_cat = SampleType(1.064);
-    g = tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
+    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
 }
 
 template <typename SampleType>
@@ -31,36 +31,35 @@ MoogCat<SampleType>::~MoogCat(){
 }
 template <typename SampleType>
 //cutoff getter and setter
-void MoogCat<SampleType>::setCutoffFrequency(SampleType cutoff_frequency){
+void MoogCat<SampleType>::setCutoffFrequency(SampleType cutoff_frequency) noexcept{
     fc = cutoff_frequency;
 }
 
 template <typename SampleType>
 //resonance getter and setter
-void MoogCat<SampleType>::setResonance(SampleType resonance){
+void MoogCat<SampleType>::setResonance(SampleType resonance) noexcept {
     res = resonanceMap(resonance);
 }
 
 template <typename SampleType>
 // coeeficient of filter type getter and setter
-void MoogCat<SampleType>::setFilterType(SampleType r){
+void MoogCat<SampleType>::setFilterType(SampleType r) noexcept {
     r_cat = filterTypeMap(r);
 }
 template <typename SampleType>
 //sampleRate getter and setter
-void MoogCat<SampleType>::setSampleRate(SampleType sampleRate){
+void MoogCat<SampleType>::setSampleRate(SampleType sampleRate) noexcept {
     Fs = sampleRate;
 }
 template <typename SampleType>
 //update the filter
-void MoogCat<SampleType>::initFilter(){
+void MoogCat<SampleType>::initFilter() noexcept{
     
-    g = tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
-    //setFilterMatrices();
+    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
 }
 
 template <typename SampleType>
-void MoogCat<SampleType>::initFilter(SampleType cutoff, SampleType resonance, SampleType type){
+void MoogCat<SampleType>::initFilter(SampleType cutoff, SampleType resonance, SampleType type) noexcept {
     
     fc = cutoff;
     res = resonanceMap(resonance);
@@ -69,12 +68,11 @@ void MoogCat<SampleType>::initFilter(SampleType cutoff, SampleType resonance, Sa
     resonanceSmoother.setCurrentAndTargetValue(res);
     morphingSmoother.setCurrentAndTargetValue(r_cat);
     
-    g = tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
-    //setFilterMatrices();
+    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
 }
 
 template <typename SampleType>
-void MoogCat<SampleType>::update(SampleType cutoff, SampleType resonance, SampleType type){
+void MoogCat<SampleType>::update(SampleType cutoff, SampleType resonance, SampleType type) noexcept {
     
     cutoffSmoother.setTargetValue(cutoff);
     resonanceSmoother.setTargetValue(resonanceMap(resonance));
@@ -109,7 +107,7 @@ template <typename SampleType>
 //filter processing method
 //input to be processed
 //channel to be processed
-SampleType MoogCat<SampleType>::processSample(SampleType input, size_t channel){
+SampleType MoogCat<SampleType>::processSample(SampleType input, size_t channel) noexcept {
     auto& s = state[channel];
     const auto den = (4*res*g*g*g*g*r_cat*r_cat + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat + 2*g*g + 4*g*r_cat + 1);
     SampleType out = (g*g*g*s[0] - g*g*(2*g*r_cat + 1)*s[1] + g*(g*g + 2*g*r_cat + 1)*s[2] - (2*g*g*g*r_cat + 4*g*g*r_cat*r_cat + g*g + 4*g*r_cat + 1)*s[3])/den;
@@ -125,18 +123,14 @@ SampleType MoogCat<SampleType>::processSample(SampleType input, size_t channel){
 }
 
 template <typename SampleType>
-void MoogCat<SampleType>::updateSmoothersAndStateSpace(){
-    
-//    const auto currentFreq = cutoffSmoother.getCurrentValue();
-//    const auto currentRes = resonanceSmoother.getCurrentValue();
-//    const auto currentMorph = morphingSmoother.getCurrentValue();
+void MoogCat<SampleType>::updateSmoothersAndStateSpace() noexcept {
     
     const auto nextFreq = cutoffSmoother.getNextValue();
     const auto nextResonance = resonanceSmoother.getNextValue();
     const auto nextMorphing = morphingSmoother.getNextValue();
     
     fc = nextFreq;
-    g = tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
+    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
     res = resonanceMap(nextResonance);
     r_cat = filterTypeMap(nextMorphing);
 }

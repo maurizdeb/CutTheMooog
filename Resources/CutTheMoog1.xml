@@ -74,7 +74,7 @@
     <View background-color="FFCC0DC7" flex-direction="column" flex-wrap="nowrap"
           flex-align-content="stretch" flex-align-items="stretch" flex-justify-content="start">
       <Plot flex-grow="2.5" source="analyser" plot-color="FFCC0DC7" background-color="FF30CDE9"/>
-      <Slider caption="OUTPUT" parameter="gain" caption-color="FF30CDE9" background-color="FFCC0DC7"
+      <Slider caption="OUTPUT" parameter="output" caption-color="FF30CDE9" background-color="FFCC0DC7"
               lookAndFeel="MYLNF" slider-type="rotary-horizontal-vertical"
               rotary-fill="FF30CDE9" slider-text="FF30CDE9" slider-text-outline="FFCC0DC7"/>
     </View>

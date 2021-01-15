@@ -22,7 +22,7 @@ public:
     void prepare(const juce::dsp::ProcessSpec& spec);
     void reset();
     void initWavefolder(size_t samplesPerBlock, SampleType startingFold, SampleType startingOffset);
-    SampleType getLatency();
+    SampleType getLatency() noexcept;
     
     template <typename ProcessContext>
     void process(const ProcessContext& context){
@@ -57,15 +57,17 @@ public:
         mixer.mixWetSamples(outputBlock);
     };
     
-    SampleType getFold();
-    void setFold(SampleType folding);
+    SampleType getFold() noexcept;
+    void setFold(SampleType folding) noexcept;
     
-    SampleType getOffset();
-    void setOffset(SampleType inputOffset);
+    SampleType getOffset() noexcept;
+    void setOffset(SampleType inputOffset) noexcept;
     
-    void setSampleRate(SampleType samplingFreq);
+    void setSampleRate(SampleType samplingFreq) noexcept;
     
-    void setMixProportion(SampleType mix);
+    void setMixProportion(SampleType mix) noexcept;
+    
+    void releaseResources();
     
     
 private:
@@ -74,10 +76,10 @@ private:
     dsp::Oversampling<SampleType> oversampler;
     
     SmoothedValue<SampleType, ValueSmoothingTypes::Linear> foldSmoother, offsetSmoother;
-    void updateSmoothers();
+    void updateSmoothers() noexcept;
     SampleType currentFold, fold, currentOffset, offset;
-    SampleType foldMapping(SampleType x){return jmap(x, SampleType(1), SampleType(10));};
-    SampleType offsetMapping(SampleType x){return jmap(x, SampleType(0), SampleType(5));};
+    SampleType foldMapping(SampleType x) noexcept {return jmap(x, SampleType(1), SampleType(10));};
+    SampleType offsetMapping(SampleType x) noexcept {return jmap(x, SampleType(0), SampleType(5));};
     dsp::LookupTableTransform<SampleType> tanhLUT { [] (SampleType x) { return std::tanh (x); },
                                                          SampleType (-6), SampleType (6), 256 };
     
@@ -89,7 +91,7 @@ private:
     SampleType refl, k; //filter coefficients DC blocker
     
     
-    SampleType processSampleLWFOneStage(SampleType input);
+    SampleType processSampleLWFOneStage(SampleType input) noexcept;
     
     const SampleType alpha = SampleType(2)*SampleType(7.5)/SampleType(15);
     const SampleType beta = (SampleType(2)*SampleType(7.5) + SampleType(15))/(SampleType(0.025864)*SampleType(15));
@@ -106,6 +108,6 @@ private:
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(LockWavefolder);
 protected:
     
-    SampleType processSample(SampleType input, size_t channel);
+    SampleType processSample(SampleType input, size_t channel) noexcept;
     
 };
