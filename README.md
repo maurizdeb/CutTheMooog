@@ -1,6 +1,12 @@
-# Cut-The-Moog
+# CutTheMoog
+[![Download Latest](https://img.shields.io/badge/download-latest-blue.svg)](https://github.com/maurizdeb/CutTheMoog/releases/latest)
+[![License: GPL v3](https://img.shields.io/badge/License-GPLv3-brightgreen.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
-This repository contains the source code of an audio VST3/AU plugin which emulates the behavior of the Lockhart Wavefolder and the Moog Filter.
+This repository contains the source code of an audio plugin which emulates the behavior of the Lockhart Wavefolder and the Moog Filter.
+
+## Description
+
+![Pic](https://github.com/maurizdeb/CutTheMoog/blob/master/Screenshot/Screenv1.0.png)
 
 The audio chain of the plugin consists on:
 
@@ -16,3 +22,16 @@ The audio chain of the plugin consists on:
   * Resonance pot -> it controls the resonance of the filter, which is the quality factor of the filter.
 * Output section containing:
   * Output pot -> it controls the amount of output signal between -60dB and 6dB 
+
+## Installation
+
+You can download the latest release [here](https://github.com/maurizdeb/CutTheMoog/releases/latest).
+CutTheMoog is available for macOs, Windows and Linux in the following formats:
+
+* VST
+* VST3
+* AU
+
+## License
+
+CutTheMoog is licensed under the General Public License agreement.
