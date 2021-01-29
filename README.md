@@ -1,4 +1,4 @@
-# CutTheMoog
+# CutTheMooog
 [![Download Latest](https://img.shields.io/badge/download-latest-blue.svg)](https://github.com/maurizdeb/CutTheMoog/releases/latest)
 [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-brightgreen.svg)](https://www.gnu.org/licenses/gpl-3.0)
 [![Donate](https://img.shields.io/badge/Donate-PayPal-green.svg)](https://www.paypal.com/donate?hosted_button_id=W7VEU56ZXZXFA)
