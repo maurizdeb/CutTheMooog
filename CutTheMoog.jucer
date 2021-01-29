@@ -1,17 +1,14 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <JUCERPROJECT id="aDkQQu" name="CutTheMoog" projectType="audioplug" pluginFormats="buildAU,buildStandalone,buildVST,buildVST3"
-              jucerFormatVersion="1" pluginManufacturer="KarotaSound" companyName="KarotaSound">
+              jucerFormatVersion="1" pluginManufacturer="KarotaSound" companyName="KarotaSound"
+              pluginName="CutTheMooog" pluginDesc="Audio plugin which reproduces the behavior of the well known Wavefolder and Ladder Filter."
+              version="1.1" bundleIdentifier="com.KarotaSound.CutTheMooog">
   <MAINGROUP id="awbd8A" name="CutTheMoog">
     <GROUP id="{5A40FCF0-84E4-C3C2-BFE1-EC2C48F7F36F}" name="Resources">
       <FILE id="wqDfXh" name="powerswitch.svg" compile="0" resource="1" file="Resources/powerswitch.svg"/>
-      <FILE id="GVdLkB" name="CutTheMoog2.xml" compile="0" resource="1" file="Resources/CutTheMoog2.xml"/>
-      <FILE id="lQ2G60" name="CutTheMoog.svg" compile="0" resource="1" file="Resources/CutTheMoog.svg"/>
       <FILE id="vQsDTz" name="CutTheMoog_logoprova2.png" compile="0" resource="1"
             file="Resources/CutTheMoog_logoprova2.png"/>
-      <FILE id="SRZdhQ" name="CutTheMoog.png" compile="0" resource="1" file="Resources/CutTheMoog.png"/>
-      <FILE id="nB2nmo" name="CutTheMoog_logo.png" compile="0" resource="1"
-            file="Resources/CutTheMoog_logo.png"/>
       <FILE id="vSFr5N" name="FuturaBoldFont.ttf" compile="0" resource="1"
             file="Resources/FuturaBoldFont.ttf"/>
       <FILE id="lWIZOA" name="FuturaHeavyfont.ttf" compile="0" resource="1"
@@ -19,8 +16,6 @@
       <FILE id="XwBRAe" name="CutTheMoog3.xml" compile="0" resource="1" file="Resources/CutTheMoog3.xml"/>
       <FILE id="rvkj94" name="FuturaBookFont.ttf" compile="0" resource="1"
             file="Resources/FuturaBookFont.ttf"/>
-      <FILE id="hoMGOY" name="CutTheMoog1.xml" compile="0" resource="1" file="Resources/CutTheMoog1.xml"/>
-      <FILE id="sAth7D" name="CutTheMoog.xml" compile="0" resource="1" file="Resources/CutTheMoog.xml"/>
     </GROUP>
     <GROUP id="{3D6D0CDE-3F95-3CD8-4B9A-03A7EC5AC5AD}" name="Source">
       <GROUP id="{DD1CB46E-48EB-E3F8-6E18-14DD3AAB0C1A}" name="Processors">
