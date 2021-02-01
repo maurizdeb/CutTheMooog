@@ -177,15 +177,15 @@ void CutTheMoogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
 {
     ScopedNoDenormals noDenormals;
     
-    updateTrimParams();
-    updateFolderParams();
-    updateFilterParams();
-    updateOutputParams();
     auto bypassParam = treeState.getRawParameterValue(BYPASS_ID);
     if (! bypass.processBlockIn(buffer, *bypassParam)){
         analyser -> pushSamples(buffer);
         return;
     }
+    updateTrimParams();
+    updateFolderParams();
+    updateFilterParams();
+    updateOutputParams();
     dsp::AudioBlock<float> block(buffer);
     processorChain.process(dsp::ProcessContextReplacing<float> (block));
     bypass.processBlockOut(buffer, *bypassParam);
