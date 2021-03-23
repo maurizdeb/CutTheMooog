@@ -51,9 +51,6 @@ public:
         }
         auto& outputBlock = context.getOutputBlock();
         oversampler.processSamplesDown(outputBlock);
-        for (int ch = 0; ch < numChannels; ++ch){
-            dcBlockers[ch].processBlock(outputBlock.getChannelPointer (ch), (int) context.getOutputBlock().getNumSamples());
-        }
         mixer.mixWetSamples(outputBlock);
     };
     
@@ -85,8 +82,6 @@ private:
     
     dsp::DryWetMixer<SampleType> mixer { 20 };
     
-    //vector of states
-    DCBlocker dcBlockers[2];
     
     SampleType refl, k; //filter coefficients DC blocker
     

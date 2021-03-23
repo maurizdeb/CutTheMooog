@@ -32,6 +32,7 @@
 #include "Processors/MoogCat.h"
 #include "Processors/LockWavefolder.h"
 #include "Processors/BypassProcessor.h"
+#include "Processors/DCBlocker.h"
 #include "PowerButton.h"
 #include "OtherLookAndFeel.h"
 
@@ -129,6 +130,8 @@ private:
     
     OtherLookAndFeel myLnf;
     
+    DCBlocker dcBlockers[2];
+    void applyDCblock(AudioBuffer<float> buffer);
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CutTheMoogAudioProcessor)
 };

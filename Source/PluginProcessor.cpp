@@ -139,6 +139,8 @@ void CutTheMoogAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     setLatencySamples(roundToInt(getLatency()));
     bypass.prepare(spec, true, getLatency());
     analyser->prepareToPlay (sampleRate, samplesPerBlock);
+    dcBlockers[0].prepare(sampleRate, 30.0f);
+    dcBlockers[1].prepare(sampleRate, 30.0f);
 }
 
 void CutTheMoogAudioProcessor::releaseResources()
@@ -188,6 +190,7 @@ void CutTheMoogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
     updateOutputParams();
     dsp::AudioBlock<float> block(buffer);
     processorChain.process(dsp::ProcessContextReplacing<float> (block));
+    applyDCblock(buffer);
     bypass.processBlockOut(buffer, *bypassParam);
     analyser -> pushSamples(buffer);
     
@@ -342,6 +345,11 @@ void CutTheMoogAudioProcessor::updateTrimParams(){
         trimShouldUpdate = false;
     }
     
+}
+
+void CutTheMoogAudioProcessor::applyDCblock(AudioBuffer<float> buffer){
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        dcBlockers[ch].processBlock (buffer.getWritePointer (ch), buffer.getNumSamples());
 }
 
 float CutTheMoogAudioProcessor::getLatency(){

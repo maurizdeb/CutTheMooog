@@ -14,24 +14,18 @@
  * Uses Transposed Direct Form II:
  * https://ccrma.stanford.edu/~jos/fp/Transposed_Direct_Forms.html
  */
-template<int order, typename FloatType=float>
+template<size_t order, typename FloatType=float>
 class MyIIRFilter
 {
 public:
     MyIIRFilter() = default;
-    virtual ~MyIIRFilter() {}
+    
+    virtual ~MyIIRFilter(){}
 
     /** Reset filter state */
     virtual void reset()
     {
         std::fill (z, &z[order+1], 0.0f);
-    }
-
-    /** Set coefficients to new values */
-    virtual void setCoefs (const FloatType (&newB)[order+1], const FloatType (&newA)[order+1])
-    {
-        std::copy (newB, &newB[order+1], b);
-        std::copy (newA, &newA[order+1], a);
     }
 
     /** Optimized processing call for first-order filter */
@@ -55,7 +49,7 @@ public:
         return y;
     }
 
-    /** Optimized processing call for Nth-order filter */
+    /** Generalized processing call for Nth-order filter */
     template <int N = order>
     inline typename std::enable_if <(N > 2), FloatType>::type
     processSample (FloatType x) noexcept
@@ -75,6 +69,13 @@ public:
     {
         for (int n = 0; n < numSamples; ++n)
             block[n] = processSample (block[n]);
+    }
+
+    /** Set coefficients to new values */
+    virtual void setCoefs (const FloatType (&newB)[order + 1], const FloatType (&newA)[order + 1])
+    {
+        std::copy (newB, &newB[order + 1], b);
+        std::copy (newA, &newA[order + 1], a);
     }
 
 protected:

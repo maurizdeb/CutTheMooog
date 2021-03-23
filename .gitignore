@@ -2,3 +2,5 @@
 **/JuceLibraryCode
 **/DSP_core
 **.DS_store
+**CMakeLists.txt
+**InstallerWindows

@@ -24,8 +24,6 @@ void LockWavefolder<SampleType>::prepare(const juce::dsp::ProcessSpec &spec){
     offsetSmoother.reset(sampleRate, SampleType(0.05));
     mixer.prepare(spec);
     
-    dcBlockers[0].prepare(sampleRate, 30.0f);
-    dcBlockers[1].prepare(sampleRate, 30.0f);
     reset();
 }
 
@@ -35,8 +33,6 @@ void LockWavefolder<SampleType>::reset(){
     foldSmoother.setCurrentAndTargetValue(fold);
     offsetSmoother.setCurrentAndTargetValue(offset);
     mixer.reset();
-    dcBlockers[0].reset();
-    dcBlockers[1].reset();
 }
 
 template <typename SampleType>
