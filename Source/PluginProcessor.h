@@ -39,7 +39,7 @@
 //==============================================================================
 /**
 */
-class CutTheMoogAudioProcessor  : public AudioProcessor,
+class CutTheMoogAudioProcessor  : public foleys::MagicProcessor,
                                 public AudioProcessorValueTreeState::Listener
 {
 public:
@@ -61,8 +61,6 @@ public:
     void processBlockBypassed (AudioBuffer<float>&, MidiBuffer&) override;
 
     //==============================================================================
-    AudioProcessorEditor* createEditor() override;
-    bool hasEditor() const override;
 
     //==============================================================================
     const String getName() const override;
@@ -80,12 +78,10 @@ public:
     void changeProgramName (int index, const String& newName) override;
 
     //==============================================================================
-    void getStateInformation (MemoryBlock& destData) override;
-    void setStateInformation (const void* data, int sizeInBytes) override;
     
     //==============================================================================
     
-    
+    void initialiseBuilder(foleys::MagicGUIBuilder& builder) override;
 
 private:
     
@@ -94,7 +90,6 @@ private:
     
     // state of the parameters: cutoff frequency and resonance
     AudioProcessorValueTreeState treeState;
-    foleys::MagicProcessorState magicState { *this, treeState };
     foleys::MagicPlotSource* analyser = nullptr;
     
     enum {

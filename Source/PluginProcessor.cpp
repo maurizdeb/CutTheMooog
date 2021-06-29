@@ -13,7 +13,7 @@
 //==============================================================================
 CutTheMoogAudioProcessor::CutTheMoogAudioProcessor()
 #ifndef JucePlugin_PreferredChannelConfigurations
-     : AudioProcessor (BusesProperties()
+     : MagicProcessor (BusesProperties()
                      #if ! JucePlugin_IsMidiEffect
                       #if ! JucePlugin_IsSynth
                        .withInput  ("Input",  AudioChannelSet::stereo(), true)
@@ -48,7 +48,7 @@ CutTheMoogAudioProcessor::CutTheMoogAudioProcessor()
     treeState.addParameterListener(DRYWET_ID, this);
     
     analyser = magicState.createAndAddObject<foleys::MagicAnalyser>("analyser");
-    magicState.addBackgroundProcessing (analyser);
+    magicState.setGuiValueTree(BinaryData::CutTheMoog5_xml, BinaryData::CutTheMoog5_xmlSize);
 }
 
 CutTheMoogAudioProcessor::~CutTheMoogAudioProcessor()
@@ -138,7 +138,7 @@ void CutTheMoogAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
     delayLine.setDelay(getLatency());
     setLatencySamples(roundToInt(getLatency()));
     bypass.prepare(spec, true, getLatency());
-    analyser->prepareToPlay (sampleRate, samplesPerBlock);
+    magicState.prepareToPlay (sampleRate, samplesPerBlock);
     dcBlockers[0].prepare(sampleRate, 30.0f);
     dcBlockers[1].prepare(sampleRate, 30.0f);
 }
@@ -205,48 +205,42 @@ void CutTheMoogAudioProcessor::processBlockBypassed(AudioBuffer<float> & buffer,
 }
 
 //==============================================================================
-bool CutTheMoogAudioProcessor::hasEditor() const
-{
-    return true; // (change this to false if you choose to not supply an editor)
-}
 
-AudioProcessorEditor* CutTheMoogAudioProcessor::createEditor()
+void CutTheMoogAudioProcessor::initialiseBuilder(foleys::MagicGUIBuilder& builder)
 {
-    //return new CutTheMoogAudioProcessorEditor (*this, treeState);
-    auto builder = std::make_unique<foleys::MagicGUIBuilder>(magicState);
-    builder->registerJUCEFactories();
+    builder.registerJUCEFactories();
+    builder.registerJUCELookAndFeels();
 
-    builder->registerFactory ("PowerButton", &PowerButtonItem::factory);
-    builder->registerLookAndFeel("Skeuomorphic", std::make_unique<foleys::Skeuomorphic>());
-    builder->registerLookAndFeel("MYLNF", std::make_unique<OtherLookAndFeel>());
+    builder.registerFactory ("PowerButton", &PowerButtonItem::factory);
+    builder.registerLookAndFeel("Skeuomorphic", std::make_unique<foleys::Skeuomorphic>());
+    builder.registerLookAndFeel("MYLNF", std::make_unique<OtherLookAndFeel>());
     LookAndFeel::setDefaultLookAndFeel(&myLnf);
-    return new foleys::MagicPluginEditor(magicState, BinaryData::CutTheMoog3_xml, BinaryData::CutTheMoog3_xmlSize, std::move(builder));
 }
 
 //==============================================================================
-void CutTheMoogAudioProcessor::getStateInformation (MemoryBlock& destData)
-{
-    // You should use this method to store your parameters in the memory block.
-    // You could do that either as raw data, or use the XML or ValueTree classes
-    // as intermediaries to make it easy to save and load complex data.
-    
-    auto state = treeState.copyState();
-    std::unique_ptr<XmlElement> fileXml(state.createXml());
-    copyXmlToBinary(*fileXml, destData);
-}
-
-void CutTheMoogAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-{
-    // You should use this method to restore your parameters from this memory block,
-    // whose contents will have been created by the getStateInformation() call.
-    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
-    
-    if (xmlState.get() != nullptr){
-        if (xmlState -> hasTagName(treeState.state.getType())){
-            treeState.replaceState(ValueTree::fromXml(*xmlState));
-        }
-    }
-}
+//void CutTheMoogAudioProcessor::getStateInformation (MemoryBlock& destData)
+//{
+//    // You should use this method to store your parameters in the memory block.
+//    // You could do that either as raw data, or use the XML or ValueTree classes
+//    // as intermediaries to make it easy to save and load complex data.
+//
+//    auto state = treeState.copyState();
+//    std::unique_ptr<XmlElement> fileXml(state.createXml());
+//    copyXmlToBinary(*fileXml, destData);
+//}
+//
+//void CutTheMoogAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
+//{
+//    // You should use this method to restore your parameters from this memory block,
+//    // whose contents will have been created by the getStateInformation() call.
+//    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
+//
+//    if (xmlState.get() != nullptr){
+//        if (xmlState -> hasTagName(treeState.state.getType())){
+//            treeState.replaceState(ValueTree::fromXml(*xmlState));
+//        }
+//    }
+//}
 
 void CutTheMoogAudioProcessor::parameterChanged (const String &treeWhosePropertyHasChanged, float newValue){
     
