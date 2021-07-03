@@ -217,30 +217,6 @@ void CutTheMoogAudioProcessor::initialiseBuilder(foleys::MagicGUIBuilder& builde
     LookAndFeel::setDefaultLookAndFeel(&myLnf);
 }
 
-//==============================================================================
-//void CutTheMoogAudioProcessor::getStateInformation (MemoryBlock& destData)
-//{
-//    // You should use this method to store your parameters in the memory block.
-//    // You could do that either as raw data, or use the XML or ValueTree classes
-//    // as intermediaries to make it easy to save and load complex data.
-//
-//    auto state = treeState.copyState();
-//    std::unique_ptr<XmlElement> fileXml(state.createXml());
-//    copyXmlToBinary(*fileXml, destData);
-//}
-//
-//void CutTheMoogAudioProcessor::setStateInformation (const void* data, int sizeInBytes)
-//{
-//    // You should use this method to restore your parameters from this memory block,
-//    // whose contents will have been created by the getStateInformation() call.
-//    std::unique_ptr<XmlElement> xmlState(getXmlFromBinary(data, sizeInBytes));
-//
-//    if (xmlState.get() != nullptr){
-//        if (xmlState -> hasTagName(treeState.state.getType())){
-//            treeState.replaceState(ValueTree::fromXml(*xmlState));
-//        }
-//    }
-//}
 
 void CutTheMoogAudioProcessor::parameterChanged (const String &treeWhosePropertyHasChanged, float newValue){
     
