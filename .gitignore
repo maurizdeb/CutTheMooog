@@ -4,3 +4,7 @@
 **.DS_store
 **CMakeLists.txt
 **InstallerWindows
+**/buildMacOs
+**/VSTSDK
+**/cmake-build-debug
+**/cmake-build-release
