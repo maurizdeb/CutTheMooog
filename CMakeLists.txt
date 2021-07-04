@@ -104,4 +104,7 @@ target_link_libraries(CutTheMoog PRIVATE
         juce::juce_recommended_warning_flags
 )
 
+set_target_properties(BinaryData PROPERTIES # replace target name
+        POSITION_INDEPENDENT_CODE TRUE)
+
 
