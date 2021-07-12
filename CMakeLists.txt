@@ -48,6 +48,7 @@ juce_add_plugin(CutTheMoog
         VST3_CATEGORIES Fx Distortion
         AU_MAIN_TYPE kAudioUnitType_Effect
         AAX_CATEGORY AAX_ePlugInCategory_Harmonic
+        COPY_PLUGIN_AFTER_BUILD TRUE
 )
 
 # compile with C++14

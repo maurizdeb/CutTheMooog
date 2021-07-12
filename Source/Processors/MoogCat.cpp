@@ -10,107 +10,92 @@
 
 #include "MoogCat.h"
 
-template <typename SampleType>
 //constructor
-MoogCat<SampleType>::MoogCat(): state(2){
-    
-    cutoffSmoother.setCurrentAndTargetValue(cutoffSmoother.getTargetValue());
-    resonanceSmoother.setCurrentAndTargetValue(resonanceSmoother.getTargetValue());
-    morphingSmoother.setCurrentAndTargetValue(morphingSmoother.getTargetValue());
-    
-    fc = SampleType(800);
-    res = SampleType(0);
-    r_cat = SampleType(1.064);
-    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
+MoogCat::MoogCat(AudioProcessorValueTreeState& vts): state(2){
+
+    cutoffParam = vts.getRawParameterValue(FREQUENCY_ID);
+    resParam = vts.getRawParameterValue(RESONANCE_ID);
+    morphParam = vts.getRawParameterValue(MORPHING_ID);
+
+    cutoffSmoother.reset(NUM_STEPS);
+    resonanceSmoother.reset(NUM_STEPS);
+    morphingSmoother.reset(NUM_STEPS);
+
+    fc = *cutoffParam;
+    res = *resParam;
+    r_cat = *morphParam;
+    g = dsp::FastMathApproximations::tan(juce::MathConstants<float>::pi * fc / Fs);
+
+    setSampleRate(44100.0f);
+    setCutoffFrequency(*cutoffParam);
+    setResonance(*resParam);
+    setFilterType(*morphParam);
 }
 
-template <typename SampleType>
 //destructor
-MoogCat<SampleType>::~MoogCat(){
+MoogCat::~MoogCat(){
     
 }
-template <typename SampleType>
+
+void MoogCat::createParameterLayout(std::vector<std::unique_ptr<RangedAudioParameter>>& params) {
+
+    params.push_back(std::make_unique<AudioParameterFloat>(FREQUENCY_ID, FREQUENCY_NAME, NormalisableRange<float>(20.0f, 20000.0f, 0.01f, 0.1989f), 800.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>(RESONANCE_ID, RESONANCE_NAME, NormalisableRange<float>(0.0f, 1.0f, 0.001f, 0.5f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>(MORPHING_ID, MORPHING_NAME, NormalisableRange<float>(0.0f, 1.0f, 0.001f), 0.564f));
+
+}
+
 //cutoff getter and setter
-void MoogCat<SampleType>::setCutoffFrequency(SampleType cutoff_frequency) noexcept{
-    fc = cutoff_frequency;
+void MoogCat::setCutoffFrequency(float cutoff_frequency) noexcept{
+    cutoffSmoother.setTargetValue(cutoff_frequency);
 }
 
-template <typename SampleType>
 //resonance getter and setter
-void MoogCat<SampleType>::setResonance(SampleType resonance) noexcept {
-    res = resonanceMap(resonance);
+void MoogCat::setResonance(float resn) noexcept {
+    resonanceSmoother.setTargetValue(resonanceMap(resn));
 }
 
-template <typename SampleType>
 // coeeficient of filter type getter and setter
-void MoogCat<SampleType>::setFilterType(SampleType r) noexcept {
-    r_cat = filterTypeMap(r);
+void MoogCat::setFilterType(float r) noexcept {
+    morphingSmoother.setTargetValue(filterTypeMap(r));
 }
-template <typename SampleType>
+
 //sampleRate getter and setter
-void MoogCat<SampleType>::setSampleRate(SampleType sampleRate) noexcept {
+void MoogCat::setSampleRate(float sampleRate) noexcept {
     Fs = sampleRate;
 }
-template <typename SampleType>
-//update the filter
-void MoogCat<SampleType>::initFilter() noexcept{
-    
-    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
-}
 
-template <typename SampleType>
-void MoogCat<SampleType>::initFilter(SampleType cutoff, SampleType resonance, SampleType type) noexcept {
-    
-    fc = cutoff;
-    res = resonanceMap(resonance);
-    r_cat = filterTypeMap(type);
-    cutoffSmoother.setCurrentAndTargetValue(fc);
-    resonanceSmoother.setCurrentAndTargetValue(res);
-    morphingSmoother.setCurrentAndTargetValue(r_cat);
-    
-    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
-}
 
-template <typename SampleType>
-void MoogCat<SampleType>::update(SampleType cutoff, SampleType resonance, SampleType type) noexcept {
-    
-    cutoffSmoother.setTargetValue(cutoff);
-    resonanceSmoother.setTargetValue(resonanceMap(resonance));
-    morphingSmoother.setTargetValue(filterTypeMap(type));
-    
-}
-
-template <typename SampleType>
 //prepare the filter
-void MoogCat<SampleType>::prepare(const juce::dsp::ProcessSpec& spec){
+void MoogCat::prepare(const juce::dsp::ProcessSpec& spec){
     
-    setSampleRate(SampleType(spec.sampleRate));
+    setSampleRate((float) spec.sampleRate);
     setNumChannels(spec.numChannels);
-    cutoffSmoother.reset(spec.sampleRate, SampleType(0.05));
-    resonanceSmoother.reset(spec.sampleRate, SampleType(0.05));
-    morphingSmoother.reset(spec.sampleRate, SampleType(0.05));
-    
-    initFilter();
+
+    cutoffSmoother.skip(NUM_STEPS);
+    morphingSmoother.skip(NUM_STEPS);
+    resonanceSmoother.skip(NUM_STEPS);
+
     reset();
 }
 
-template <typename SampleType>
 //reset the filter
-void MoogCat<SampleType>::reset(){
+void MoogCat::reset(){
     
     for (auto& s:state) {
-        s.fill(SampleType(0));
+        s.fill(0.0);
     }
+
 }
 
-template <typename SampleType>
 //filter processing method
 //input to be processed
 //channel to be processed
-SampleType MoogCat<SampleType>::processSample(SampleType input, size_t channel) noexcept {
+//TODO: reduce complexity of this process
+float MoogCat::processSample(float input, size_t channel) noexcept {
     auto& s = state[channel];
     const auto den = (4*res*g*g*g*g*r_cat*r_cat + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat + 2*g*g + 4*g*r_cat + 1);
-    SampleType out = (g*g*g*s[0] - g*g*(2*g*r_cat + 1)*s[1] + g*(g*g + 2*g*r_cat + 1)*s[2] - (2*g*g*g*r_cat + 4*g*g*r_cat*r_cat + g*g + 4*g*r_cat + 1)*s[3])/den;
+    float out = (g*g*g*s[0] - g*g*(2*g*r_cat + 1)*s[1] + g*(g*g + 2*g*r_cat + 1)*s[2] - (2*g*g*g*r_cat + 4*g*g*r_cat*r_cat + g*g + 4*g*r_cat + 1)*s[3])/den;
     const auto a = -(res*g*g*g*g*r_cat*r_cat*4 + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat - 1)*s[0] + 2*g*(res*g*g*r_cat*r_cat*4 + g*g + 2*g*r_cat + 1)*s[1] - 8*g*g*res*r_cat*r_cat*s[2] + 8*g*res*r_cat*r_cat*(2*g*r_cat+1)*s[3] + g*(g*g + r_cat*2*g + 1)*2*input;
     const auto b = - 2*g*(g*g + r_cat*2*g + 1)*s[0] + (-res*g*g*g*g*r_cat*r_cat*4 - g*g*g*g + 4*g*g*r_cat*r_cat + 4*g*r_cat + 1)*s[1] + 8*g*g*g*res*r_cat*r_cat*s[2] - 8*g*g*res*r_cat*r_cat*(2*g*r_cat+1)*s[3] - g*g*(g*g + r_cat*2*g + 1)*2*input;
     const auto c = 2*g*g*s[0] - g*(2*g*r_cat + 1)*2*s[1] - (res*g*g*g*g*r_cat*r_cat*4 + g*g*g*g + 4*g*g*g*r_cat + 4*g*g*r_cat*r_cat - 1)*s[2] + 2*g*(res*g*g*r_cat*r_cat*4 + g*g + 2*g*r_cat + 1)*s[3] + 2*g*g*g*input;
@@ -122,18 +107,30 @@ SampleType MoogCat<SampleType>::processSample(SampleType input, size_t channel) 
     return out;
 }
 
-template <typename SampleType>
-void MoogCat<SampleType>::updateSmoothersAndStateSpace() noexcept {
+void MoogCat::updateSmoothers() noexcept {
     
-    const auto nextFreq = cutoffSmoother.getNextValue();
-    const auto nextResonance = resonanceSmoother.getNextValue();
-    const auto nextMorphing = morphingSmoother.getNextValue();
+    const float nextFreq = cutoffSmoother.getNextValue();
+    const float nextResonance = resonanceSmoother.getNextValue();
+    const float nextMorphing = morphingSmoother.getNextValue();
     
     fc = nextFreq;
-    g = dsp::FastMathApproximations::tan(SampleType(juce::MathConstants<float>::pi)*fc/Fs);
-    res = resonanceMap(nextResonance);
-    r_cat = filterTypeMap(nextMorphing);
+    g = dsp::FastMathApproximations::tan ( juce::MathConstants<float>::pi * fc / Fs );
+    res = nextResonance;
+    r_cat = nextMorphing;
 }
 
-template class MoogCat<float>;
-template class MoogCat<double>;
+void MoogCat::process(AudioBuffer<float>& buffer){
+
+    setCutoffFrequency(*cutoffParam);
+    setResonance(*resParam);
+    setFilterType(*morphParam);
+
+
+    for (size_t n = 0; n < buffer.getNumSamples(); ++n){
+
+        updateSmoothers();
+
+        for (unsigned int ch = 0; ch < 2; ++ch)
+            buffer.getWritePointer(ch)[n] = processSample (buffer.getReadPointer (ch)[n], ch);
+    }
+}

@@ -9,22 +9,10 @@
 */
 
 #pragma once
-#define FREQUENCY_ID "frequency"
-#define FREQUENCY_NAME "Frequency"
-#define RESONANCE_ID "resonance"
-#define RESONANCE_NAME "Resonance"
 #define GAIN_ID "output"
 #define GAIN_NAME "Output"
-#define MORPHING_ID "morphing"
-#define MORPHING_NAME "Morphing"
-#define FOLDING_ID "folding"
-#define FOLDING_NAME "Folding"
-#define OFFSET_ID "offset"
-#define OFFSET_NAME "Offset"
 #define TRIM_ID "trim"
 #define TRIM_NAME "Trim"
-#define DRYWET_ID "drywet"
-#define DRYWET_NAME "DryWet"
 #define BYPASS_ID "bypass"
 #define BYPASS_NAME "Bypass"
 
@@ -39,8 +27,7 @@
 //==============================================================================
 /**
 */
-class CutTheMoogAudioProcessor  : public foleys::MagicProcessor,
-                                public AudioProcessorValueTreeState::Listener
+class CutTheMoogAudioProcessor  : public foleys::MagicProcessor
 {
 public:
     //==============================================================================
@@ -84,49 +71,22 @@ public:
     void initialiseBuilder(foleys::MagicGUIBuilder& builder) override;
 
 private:
-    
-    //istance of the filter
-    //MoogCat<float> filterMoogCat;
-    
-    // state of the parameters: cutoff frequency and resonance
+
     AudioProcessorValueTreeState treeState;
     foleys::MagicPlotSource* analyser = nullptr;
-    
-    enum {
-        trimIndex,
-        folderIndex,
-        filterIndex,
-        outputIndex
-    };
-    
-    juce::dsp::ProcessorChain<juce::dsp::Gain<float>,LockWavefolder<float>, MoogCat<float>, juce::dsp::Gain<float>> processorChain;
-    dsp::DelayLine<float, dsp::DelayLineInterpolationTypes::Thiran> delayLine{20};
+
+    dsp::DelayLine<float, dsp::DelayLineInterpolationTypes::Lagrange3rd> delayLine{20};
     BypassProcessor bypass;
     float getLatency();
     
-    std::atomic<bool> filterShouldUpdate {false};
-    std::atomic<bool> gainShouldUpdate {false};
-    std::atomic<bool> foldShouldUpdate {false};
-    std::atomic<bool> trimShouldUpdate {false};
-    
-    void parameterChanged (const String &treeWhosePropertyHasChanged, float newValue) override;
-    
-    void updateFilterParams();
-    void initFilterParams();
-    
-    void initFolderParams(int SamplesPerBlock);
-    void updateFolderParams();
-    
-    void updateOutputParams();
-    void initOutput();
-    
-    void initTrimParams();
-    void updateTrimParams();
-    
     OtherLookAndFeel myLnf;
-    
-    DCBlocker dcBlockers[2];
-    void applyDCblock(AudioBuffer<float> buffer);
+
+    LockWavefolder lockWavefolder;
+    MoogCat moogCatFilter;
+
+    dsp::Gain<float> inputGain, outputGain;
+
+    AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     //==============================================================================
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (CutTheMoogAudioProcessor)
 };

@@ -10,120 +10,141 @@
 
 #include "LockWavefolder.h"
 
-template <typename SampleType>
-LockWavefolder<SampleType>::LockWavefolder(): oversampler(2,2,dsp::Oversampling<SampleType>::filterHalfBandPolyphaseIIR, true, false){
+
+LockWavefolder::LockWavefolder(AudioProcessorValueTreeState& vts): oversampler(2,2,dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false){
+
+    foldParam = vts.getRawParameterValue(FOLDING_ID);
+    offsetParam = vts.getRawParameterValue(OFFSET_ID);
+    dwParam = vts.getRawParameterValue(DRYWET_ID);
+
     mixer.setMixingRule(dsp::DryWetMixingRule::linear);
-    fold = SampleType(0.5);
-    offset = SampleType(0);
+    foldSmoother.reset(NUM_STEPS);
+    offsetSmoother.reset(NUM_STEPS);
+    setSampleRate(44100.0f);
+    setFold(*foldParam);
+    setOffset(*offsetParam);
+    setMixProportion(*dwParam);
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::prepare(const juce::dsp::ProcessSpec &spec){
-    setSampleRate(spec.sampleRate); //oversampling factor of 4 = 2^2
-    foldSmoother.reset(sampleRate, SampleType(0.05));
-    offsetSmoother.reset(sampleRate, SampleType(0.05));
+LockWavefolder::~LockWavefolder() {
+
+}
+
+void LockWavefolder::createParameterLayout(std::vector<std::unique_ptr<RangedAudioParameter>> &params) {
+
+    params.push_back(std::make_unique<AudioParameterFloat>(FOLDING_ID, FOLDING_NAME, NormalisableRange<float>(0, 1, 0.001f), 0.5f));
+    params.push_back(std::make_unique<AudioParameterFloat>(OFFSET_ID, OFFSET_NAME, NormalisableRange<float>(0, 1, 0.001f), 0.0f));
+    params.push_back(std::make_unique<AudioParameterFloat>(DRYWET_ID, DRYWET_NAME, 0.0f, 1.0f, 0.5f));
+}
+
+void LockWavefolder::prepare(const juce::dsp::ProcessSpec &spec){
+    setSampleRate((float) spec.sampleRate);
     mixer.prepare(spec);
-    
+    oversampler.initProcessing((size_t) spec.maximumBlockSize);
+    dcBlocker[0].prepare(spec.sampleRate, 30.0f);
+    dcBlocker[1].prepare(spec.sampleRate, 30.0f);
+
     reset();
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::reset(){
+
+void LockWavefolder::reset(){
     
-    foldSmoother.setCurrentAndTargetValue(fold);
-    offsetSmoother.setCurrentAndTargetValue(offset);
+    foldSmoother.skip(NUM_STEPS);
+    offsetSmoother.skip(NUM_STEPS);
     mixer.reset();
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::initWavefolder(size_t samplesPerBlock, SampleType startingFold, SampleType startingOffset){
-    
-    oversampler.initProcessing(samplesPerBlock);
-    
-    mixer.setWetLatency(oversampler.getLatencyInSamples());
-    
-    fold = startingFold;
-    currentFold = foldMapping(fold);
-    foldSmoother.setCurrentAndTargetValue(currentFold);
-    
-    offset = startingOffset;
-    currentOffset = offsetMapping(offset);
-    offsetSmoother.setCurrentAndTargetValue(currentOffset);
-}
-
-template <typename SampleType>
-SampleType LockWavefolder<SampleType>::getLatency() noexcept{
+float LockWavefolder::getLatency() noexcept{
     return oversampler.getLatencyInSamples();
 }
 
-template <typename SampleType>
-SampleType LockWavefolder<SampleType>::getFold() noexcept {
-    return fold;
+
+float LockWavefolder::getFold() noexcept {
+    return *foldParam;
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::setFold(SampleType folding) noexcept {
-    fold = folding;
-    foldSmoother.setTargetValue(foldMapping(fold));
+void LockWavefolder::setFold(float folding) noexcept {
+    foldSmoother.setTargetValue(foldMapping(folding));
 }
 
-template <typename SampleType>
-SampleType LockWavefolder<SampleType>::getOffset() noexcept {
-    return offset;
+float LockWavefolder::getOffset() noexcept {
+    return *offsetParam;
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::setOffset(SampleType inputOffset) noexcept {
-    offset = inputOffset;
-    offsetSmoother.setTargetValue(offsetMapping(offset));
+void LockWavefolder::setOffset(float inputOffset) noexcept {
+    offsetSmoother.setTargetValue(offsetMapping(inputOffset));
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::setSampleRate(SampleType samplingFreq) noexcept {
+void LockWavefolder::setSampleRate(float samplingFreq) noexcept {
     sampleRate = samplingFreq;
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::setMixProportion(SampleType mix) noexcept {
+void LockWavefolder::setMixProportion(float mix) noexcept {
     mixer.setWetMixProportion(mix);
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::updateSmoothers() noexcept {
+void LockWavefolder::updateSmoothers() noexcept {
     currentFold = foldSmoother.getNextValue();
     currentOffset = offsetSmoother.getNextValue();
 }
 
-template <typename SampleType>
-SampleType LockWavefolder<SampleType>::processSampleLWFOneStage(SampleType input) noexcept {
-    const auto sign_in = sign(input);
-    const auto delta_log = SampleType(LWSolver::logf_approx(delta));
-    const auto inputLambert = delta_log + sign_in*beta*input;
-    const auto lambert_value = SampleType(LWSolver::omega4(inputLambert));
-    const auto rightSide = sign_in*SampleType(0.025864)*lambert_value;
-    const auto leftSide = alpha*input;
+float LockWavefolder::processSampleLWFOneStage(float input) noexcept {
+    const float sign_in = sign (input);
+    const float delta_log = LWSolver::logf_approx (delta);
+    const float inputLambert = delta_log + sign_in * beta * input;
+    const float lambert_value = LWSolver::omega4 (inputLambert);
+    const float rightSide = sign_in * 0.025864f * lambert_value;
+    const float leftSide = alpha * input;
     
     return leftSide - rightSide;
 }
 
-template <typename SampleType>
-SampleType LockWavefolder<SampleType>::processSample(SampleType input, size_t channel) noexcept{
+float LockWavefolder::processSample(float input) noexcept{
     
-    const auto val1 = (currentFold*input + currentOffset);
-    const auto input_stage1 = val1/SampleType(3);
-    const auto input_stage2 = processSampleLWFOneStage(input_stage1);
-    const auto input_stage3 = processSampleLWFOneStage(input_stage2);
-    const auto input_stage4 = processSampleLWFOneStage(input_stage3);
-    const auto output_stage4 = processSampleLWFOneStage(input_stage4);
-    const auto output = output_stage4*SampleType(3);
+    const auto val1 = ( currentFold * input + currentOffset );
+    const auto input_stage1 = val1 / 3;
+    const auto input_stage2 = processSampleLWFOneStage (input_stage1);
+    const auto input_stage3 = processSampleLWFOneStage (input_stage2);
+    const auto input_stage4 = processSampleLWFOneStage (input_stage3);
+    const auto output_stage4 = processSampleLWFOneStage (input_stage4);
+    const auto output = output_stage4 * 3;
     
     return tanhLUT(output);
 }
 
-template <typename SampleType>
-void LockWavefolder<SampleType>::releaseResources(){
+void LockWavefolder::releaseResources(){
     oversampler.reset();
 }
 
-template class LockWavefolder<float>;
-template class LockWavefolder<double>;
+void LockWavefolder::applyDCblock(dsp::AudioBlock<float>& buffer) {
+
+    for (int ch = 0; ch < buffer.getNumChannels(); ++ch)
+        dcBlocker[ch].processBlock (buffer.getChannelPointer (ch), buffer.getNumSamples());
+}
+
+void LockWavefolder::process(AudioBuffer<float>& buffer){
+
+    setFold(*foldParam);
+    setOffset(*offsetParam);
+    setMixProportion(*dwParam);
+
+    dsp::AudioBlock<float> block (buffer);
+    mixer.pushDrySamples(block);
+    dsp::AudioBlock<float> ovBlock = oversampler.processSamplesUp(block);
+
+    for (size_t n = 0; n < ovBlock.getNumSamples(); ++n){
+
+        updateSmoothers();
+
+        for (size_t ch = 0; ch < 2; ++ch)
+            ovBlock.getChannelPointer (ch)[n] = processSample (ovBlock.getChannelPointer (ch)[n]);
+    }
+    oversampler.processSamplesDown(block);
+
+    applyDCblock(block);
+
+    mixer.mixWetSamples(block);
+}
+
+

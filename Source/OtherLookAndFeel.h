@@ -88,5 +88,5 @@ private:
     
     juce::Typeface::Ptr futuraBold;
     juce::Typeface::Ptr futura;
-    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OtherLookAndFeel);
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(OtherLookAndFeel)
 };

@@ -9,6 +9,7 @@
 */
 
 #pragma once
+#include <JuceHeader.h>
 
 class LWSolver{
     
@@ -20,10 +21,10 @@ public:
     
 private:
     
-    LWSolver(){};
+    LWSolver(){}
     static float log2f_approx(float x);
     static float pow2f_approx(float x);
     static float expf_approx(float x);
-    
-    
+
+    JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (LWSolver)
 };
