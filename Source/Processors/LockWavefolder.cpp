@@ -137,7 +137,7 @@ void LockWavefolder::process(AudioBuffer<float>& buffer){
 
         updateSmoothers();
 
-        for (size_t ch = 0; ch < 2; ++ch)
+        for (size_t ch = 0; ch < ovBlock.getNumChannels(); ++ch)
             ovBlock.getChannelPointer (ch)[n] = processSample (ovBlock.getChannelPointer (ch)[n]);
     }
     oversampler.processSamplesDown(block);

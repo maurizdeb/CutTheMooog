@@ -130,7 +130,7 @@ void MoogCat::process(AudioBuffer<float>& buffer){
 
         updateSmoothers();
 
-        for (unsigned int ch = 0; ch < 2; ++ch)
+        for (size_t ch = 0; ch < buffer.getNumChannels(); ++ch)
             buffer.getWritePointer(ch)[n] = processSample (buffer.getReadPointer (ch)[n], ch);
     }
 }
