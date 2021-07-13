@@ -14,6 +14,8 @@ juce_add_module(Ext/foleys_gui_magic)
 
 set(FormatsToBuild VST3)
 # set(AAX_SDK_PATH "AAXSDK")
+
+# comment or delete this line if VST2 SDK is not present
 set(VST2_SDK_PATH "VSTSDK/VST2_SDK")
 
 # On MacOs build AU

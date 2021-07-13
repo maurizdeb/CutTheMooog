@@ -54,7 +54,7 @@ public:
 private:
   
     float sampleRate;
-    dsp::Oversampling<float> oversampler;
+    std::unique_ptr<dsp::Oversampling<float>> oversampler;
     
     SmoothedValue<float, ValueSmoothingTypes::Linear> foldSmoother, offsetSmoother;
 

@@ -177,13 +177,12 @@ void CutTheMoogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
     inputGain.setGainDecibels(*treeState.getRawParameterValue(TRIM_ID) );
     outputGain.setGainDecibels(*treeState.getRawParameterValue(GAIN_ID));
 
-    dsp::AudioBlock<float> block ( buffer );
-    inputGain.process(dsp::ProcessContextReplacing<float>( block ) );
+    inputGain.process(buffer);
 
     lockWavefolder.process(buffer);
     moogCatFilter.process(buffer);
 
-    outputGain.process(dsp::ProcessContextReplacing<float> ( block ));
+    outputGain.process(buffer);
 
     bypass.processBlockOut(buffer, BypassProcessor::toBool(bypassParam));
     analyser -> pushSamples(buffer);

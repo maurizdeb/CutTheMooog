@@ -21,6 +21,7 @@
 #include "Processors/LockWavefolder.h"
 #include "Processors/BypassProcessor.h"
 #include "Processors/DCBlocker.h"
+#include "Processors/GainProcessor.h"
 #include "PowerButton.h"
 #include "OtherLookAndFeel.h"
 
@@ -84,7 +85,7 @@ private:
     LockWavefolder lockWavefolder;
     MoogCat moogCatFilter;
 
-    dsp::Gain<float> inputGain, outputGain;
+    GainProcessor inputGain, outputGain;
 
     AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     //==============================================================================

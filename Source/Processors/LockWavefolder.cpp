@@ -11,7 +11,7 @@
 #include "LockWavefolder.h"
 
 
-LockWavefolder::LockWavefolder(AudioProcessorValueTreeState& vts): oversampler(2,2,dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false){
+LockWavefolder::LockWavefolder(AudioProcessorValueTreeState& vts){
 
     foldParam = vts.getRawParameterValue(FOLDING_ID);
     offsetParam = vts.getRawParameterValue(OFFSET_ID);
@@ -24,6 +24,8 @@ LockWavefolder::LockWavefolder(AudioProcessorValueTreeState& vts): oversampler(2
     setFold(*foldParam);
     setOffset(*offsetParam);
     setMixProportion(*dwParam);
+
+    oversampler = std::make_unique<dsp::Oversampling<float>>(2, 2, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false);
 }
 
 LockWavefolder::~LockWavefolder() {
@@ -40,7 +42,7 @@ void LockWavefolder::createParameterLayout(std::vector<std::unique_ptr<RangedAud
 void LockWavefolder::prepare(const juce::dsp::ProcessSpec &spec){
     setSampleRate((float) spec.sampleRate);
     mixer.prepare(spec);
-    oversampler.initProcessing((size_t) spec.maximumBlockSize);
+    oversampler -> initProcessing((size_t) spec.maximumBlockSize);
     dcBlocker[0].prepare(spec.sampleRate, 30.0f);
     dcBlocker[1].prepare(spec.sampleRate, 30.0f);
 
@@ -56,7 +58,7 @@ void LockWavefolder::reset(){
 }
 
 float LockWavefolder::getLatency() noexcept{
-    return oversampler.getLatencyInSamples();
+    return oversampler -> getLatencyInSamples();
 }
 
 
@@ -114,7 +116,7 @@ float LockWavefolder::processSample(float input) noexcept{
 }
 
 void LockWavefolder::releaseResources(){
-    oversampler.reset();
+    oversampler -> reset();
 }
 
 void LockWavefolder::applyDCblock(dsp::AudioBlock<float>& buffer) {
@@ -131,7 +133,7 @@ void LockWavefolder::process(AudioBuffer<float>& buffer){
 
     dsp::AudioBlock<float> block (buffer);
     mixer.pushDrySamples(block);
-    dsp::AudioBlock<float> ovBlock = oversampler.processSamplesUp(block);
+    dsp::AudioBlock<float> ovBlock = oversampler -> processSamplesUp(block);
 
     for (size_t n = 0; n < ovBlock.getNumSamples(); ++n){
 
@@ -140,7 +142,7 @@ void LockWavefolder::process(AudioBuffer<float>& buffer){
         for (size_t ch = 0; ch < ovBlock.getNumChannels(); ++ch)
             ovBlock.getChannelPointer (ch)[n] = processSample (ovBlock.getChannelPointer (ch)[n]);
     }
-    oversampler.processSamplesDown(block);
+    oversampler -> processSamplesDown(block);
 
     applyDCblock(block);
 
