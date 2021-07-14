@@ -20,7 +20,7 @@
 #define DRYWET_ID "drywet"
 #define DRYWET_NAME "DryWet"
 
-#define NUM_STEPS 500
+#define NUM_STEPS 2000
 
 class LockWavefolder{
     
@@ -83,14 +83,8 @@ private:
     const float alpha = 2 * 7.5f / 15;
     const float beta = ( 2 * 7.5f + 15) / ( 0.025864f * 15 );
     const float delta = 7.5e+3f * 10e-17f / 0.025864f;
-    float sign(float x) { if(x > 0.0){
-            return 1.0;
-        }else if (x < 0.0){
-            return -1.0;
-        }else{
-            return 0.0;
-        }
-    }
+    const float delta_log = LWSolver::logf_approx (delta);
+    float sign(float x) { return (0 < x) - (x < 0); }
 
     void applyDCblock(dsp::AudioBlock<float>& buffer);
     

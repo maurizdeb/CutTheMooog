@@ -8,3 +8,5 @@
 **/cmake-build-debug
 **/cmake-build-release
 **.idea
+**/cmake-build-debug_x86
+**/cmake-build-release_x86

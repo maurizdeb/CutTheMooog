@@ -35,6 +35,12 @@ if (VST2_SDK_PATH)
     list (APPEND FormatsToBuild VST)
 endif()
 
+# Copy plugin in root directory only on MacOs
+set(Copy_Plugin_After_Build FALSE)
+if (APPLE)
+    set(Copy_Plugin_After_Build TRUE)
+endif ()
+
 # Add plugin target
 juce_add_plugin(CutTheMoog
         COMPANY_NAME KarotaSound
@@ -50,7 +56,7 @@ juce_add_plugin(CutTheMoog
         VST3_CATEGORIES Fx Distortion
         AU_MAIN_TYPE kAudioUnitType_Effect
         AAX_CATEGORY AAX_ePlugInCategory_Harmonic
-        COPY_PLUGIN_AFTER_BUILD TRUE
+        COPY_PLUGIN_AFTER_BUILD ${Copy_Plugin_After_Build}
 )
 
 # compile with C++14

@@ -93,7 +93,6 @@ void LockWavefolder::updateSmoothers() noexcept {
 
 float LockWavefolder::processSampleLWFOneStage(float input) noexcept {
     const float sign_in = sign (input);
-    const float delta_log = LWSolver::logf_approx (delta);
     const float inputLambert = delta_log + sign_in * beta * input;
     const float lambert_value = LWSolver::omega4 (inputLambert);
     const float rightSide = sign_in * 0.025864f * lambert_value;
