@@ -28,6 +28,10 @@ public:
         delayLine.setDelay(latency);
     }
 
+    void setDelayInSamples(float latency){
+        delayLine.setDelay(latency);
+    }
+
     /**
       * Call this at the start of your processBlock().
       * If it returns false, you can safely skip all other
@@ -43,8 +47,6 @@ public:
 
         if (onOffParam != prevOnOffParam){
             fadeBuffer.makeCopyOf (block, true);
-            dsp::AudioBlock<float> audioBlock(fadeBuffer);
-            delayLine.process(dsp::ProcessContextReplacing<float> (audioBlock));
         }
 
         return true;
@@ -62,6 +64,9 @@ public:
                                               : 0.0f; // fade in
         float endGain = 1.0f - startGain;
 
+        dsp::AudioBlock<float> fadeBlock(fadeBuffer);
+        delayLine.process(dsp::ProcessContextReplacing<float> (fadeBlock));
+
         block.applyGainRamp (0, numSamples, startGain, endGain);
         for (int ch = 0; ch < numChannels; ++ch)
             block.addFromWithRamp (ch, 0, fadeBuffer.getReadPointer (ch), numSamples,
@@ -73,7 +78,7 @@ public:
 private:
     bool prevOnOffParam = false;
     AudioBuffer<float> fadeBuffer;
-    dsp::DelayLine<float, dsp::DelayLineInterpolationTypes::Thiran> delayLine{20};
+    dsp::DelayLine<float, dsp::DelayLineInterpolationTypes::Lagrange3rd> delayLine{100};
 
     JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR (BypassProcessor)
 };

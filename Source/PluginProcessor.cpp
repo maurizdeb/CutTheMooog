@@ -28,7 +28,7 @@ CutTheMoogAudioProcessor::CutTheMoogAudioProcessor()
 {
     LookAndFeel::setDefaultLookAndFeel(&myLnf);
     analyser = magicState.createAndAddObject<foleys::MagicAnalyser>("analyser");
-    magicState.setGuiValueTree(BinaryData::CutTheMoog5_xml, BinaryData::CutTheMoog5_xmlSize);
+    magicState.setGuiValueTree(BinaryData::CutTheMoog6_xml, BinaryData::CutTheMoog6_xmlSize);
 }
 
 CutTheMoogAudioProcessor::~CutTheMoogAudioProcessor()
@@ -171,6 +171,8 @@ void CutTheMoogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
 
     auto bypassParam = treeState.getRawParameterValue(BYPASS_ID);
     if (! bypass.processBlockIn(buffer, BypassProcessor::toBool(bypassParam))) {
+        setLatencySamples(roundToInt(getLatency()));
+        bypass.setDelayInSamples(getLatency());
         analyser->pushSamples(buffer);
         return;
     }
@@ -181,6 +183,10 @@ void CutTheMoogAudioProcessor::processBlock (AudioBuffer<float>& buffer, MidiBuf
 
     lockWavefolder.process(buffer);
     moogCatFilter.process(buffer);
+
+    // compensate bypass buffer delay
+    setLatencySamples(roundToInt(getLatency()));
+    bypass.setDelayInSamples(getLatency());
 
     outputGain.process(buffer);
 
@@ -194,6 +200,8 @@ void CutTheMoogAudioProcessor::processBlockBypassed(AudioBuffer<float> & buffer,
     ScopedNoDenormals noDenormals;
     
     dsp::AudioBlock<float> block(buffer);
+    delayLine.setDelay(getLatency());
+    setLatencySamples(roundToInt(getLatency()));
     delayLine.process(dsp::ProcessContextReplacing<float> (block));
 }
 

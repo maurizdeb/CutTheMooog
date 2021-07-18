@@ -74,6 +74,7 @@ juce_add_binary_data(BinaryData
             Resources/CutTheMoog3.xml
             Resources/CutTheMoog4.xml
             Resources/CutTheMoog5.xml
+            Resources/CutTheMoog6.xml
             Resources/CutTheMoog_logoprova2.png
             Resources/FuturaBoldFont.ttf
             Resources/FuturaBookFont.ttf

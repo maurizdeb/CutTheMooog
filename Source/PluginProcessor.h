@@ -76,7 +76,7 @@ private:
     AudioProcessorValueTreeState treeState;
     foleys::MagicPlotSource* analyser = nullptr;
 
-    dsp::DelayLine<float, dsp::DelayLineInterpolationTypes::Lagrange3rd> delayLine{20};
+    dsp::DelayLine<float, dsp::DelayLineInterpolationTypes::Lagrange3rd> delayLine{100};
     BypassProcessor bypass;
     float getLatency();
     

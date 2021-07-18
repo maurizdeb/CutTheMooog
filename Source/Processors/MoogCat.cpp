@@ -80,12 +80,11 @@ void MoogCat::prepare(const juce::dsp::ProcessSpec& spec){
 }
 
 //reset the filter
-void MoogCat::reset(){
-    
-    for (auto& s:state) {
-        s.fill(0.0);
-    }
+void MoogCat::reset() {
 
+    for (auto &s:state) {
+        s.fill(0.0f);
+    }
 }
 
 //filter processing method
