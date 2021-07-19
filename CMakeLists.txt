@@ -5,7 +5,7 @@ if (APPLE)
     set (CMAKE_OSX_DEPLOYMENT_TARGET "10.9" CACHE INTERNAL "")
 endif()
 
-project(CutTheMoog VERSION 1.2.1)
+project(CutTheMoog VERSION 1.2.2)
 
 #Add JUCE
 add_subdirectory(Ext/JUCE)
@@ -13,7 +13,7 @@ add_subdirectory(Ext/JUCE)
 juce_add_module(Ext/foleys_gui_magic)
 
 set(FormatsToBuild VST3)
-# set(AAX_SDK_PATH "AAXSDK")
+# set(AAX_SDK_PATH "AAX_SDK_2p3p2")
 
 # comment or delete this line if VST2 SDK is not present
 set(VST2_SDK_PATH "VSTSDK/VST2_SDK")
@@ -71,10 +71,7 @@ add_subdirectory(Source)
 # add plugin binary data files
 juce_add_binary_data(BinaryData
         SOURCES
-            Resources/CutTheMoog3.xml
-            Resources/CutTheMoog4.xml
-            Resources/CutTheMoog5.xml
-            Resources/CutTheMoog6.xml
+            Resources/CutTheMoog.xml
             Resources/CutTheMoog_logoprova2.png
             Resources/FuturaBoldFont.ttf
             Resources/FuturaBookFont.ttf

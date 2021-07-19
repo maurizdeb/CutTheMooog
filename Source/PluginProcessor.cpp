@@ -28,7 +28,7 @@ CutTheMoogAudioProcessor::CutTheMoogAudioProcessor()
 {
     LookAndFeel::setDefaultLookAndFeel(&myLnf);
     analyser = magicState.createAndAddObject<foleys::MagicAnalyser>("analyser");
-    magicState.setGuiValueTree(BinaryData::CutTheMoog6_xml, BinaryData::CutTheMoog6_xmlSize);
+    magicState.setGuiValueTree(BinaryData::CutTheMoog_xml, BinaryData::CutTheMoog_xmlSize);
 }
 
 CutTheMoogAudioProcessor::~CutTheMoogAudioProcessor()
@@ -40,7 +40,7 @@ AudioProcessorValueTreeState::ParameterLayout CutTheMoogAudioProcessor::createPa
     std::vector<std::unique_ptr<RangedAudioParameter>> params;
 
     params.push_back (std::make_unique<AudioParameterFloat> (GAIN_ID, GAIN_NAME, -40.0f, 12.0f, -1.0f));
-    params.push_back (std::make_unique<AudioParameterFloat> (TRIM_ID, TRIM_NAME, -24.0f, 24.0f, 0.0f));
+    params.push_back (std::make_unique<AudioParameterFloat> (TRIM_ID, TRIM_NAME, -8.0f, 8.0f, 0.0f));
     params.push_back (std::make_unique<AudioParameterBool> (BYPASS_ID, BYPASS_NAME, true));
 
     MoogCat::createParameterLayout(params);

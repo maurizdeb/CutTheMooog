@@ -21,8 +21,10 @@
 #define DRYWET_NAME "DryWet"
 #define OV_ID "oversampling"
 #define OV_NAME "Oversampling"
+#define ADAA_ID "antialiasing"
+#define ADAA_NAME "Antialiasing"
 
-#define NUM_STEPS 2000
+#define NUM_STEPS 2205
 
 class LockWavefolder{
     
@@ -46,6 +48,7 @@ public:
     void setOffset(float inputOffset) noexcept;
 
     void setOversampling() noexcept;
+    void setADAA() noexcept;
     
     void setSampleRate(float samplingFreq) noexcept;
     void setNumChannels(size_t channels);
@@ -69,7 +72,8 @@ private:
     std::atomic<float>* offsetParam = nullptr;
     std::atomic<float>* dwParam = nullptr;
     std::atomic<float>* osParam = nullptr;
-    int prevOs = 0, curOs = 0;
+    std::atomic<float>* adaaParam = nullptr;
+    int prevOs = 0, curOs = 0, curADAA = 1, prevADAA = 1;
 
     static constexpr float alpha = 2 * 7.5f / 15;
     static constexpr float alpha_half = alpha / 2;
@@ -77,10 +81,10 @@ private:
     static constexpr float delta = 7.5e+3f * 10e-17f / 0.025864f;
     const float delta_log = LWSolver::log_approx (delta);
     static constexpr float gamma = 0.025864f / (2 * beta);
-    static constexpr float tolerance = 10e-18f;
-    static float sign(float x) { return (0 < x) - (x < 0); }
-    std::vector<std::array<float, 4>> stateADAA;
-    std::vector<float> stateTanh;
+    static constexpr float tolerance = 1e-2f;
+    float sign(float x) { return (0 < x) - (x < 0); }
+    std::vector<std::array<float, 4>> stateADAA, stateFunADAA;
+    std::vector<float> stateTanh, stateFunTanh;
 
     DCBlocker dcBlocker[2];
 
@@ -96,6 +100,7 @@ private:
                                                -6.0, 6.0, 256 };
 
     void updateSmoothers() noexcept;
+    void resetSmootherAndLatency();
     
     float processSampleLWFOneStage(float input, size_t channel, size_t stage) noexcept;
     float processSampleLWFOneStage(float input) noexcept;
