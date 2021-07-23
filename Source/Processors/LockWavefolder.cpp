@@ -11,7 +11,7 @@
 #include "LockWavefolder.h"
 
 
-LockWavefolder::LockWavefolder(AudioProcessorValueTreeState& vts): stateADAA(2), stateTanh(2), stateFunADAA(2), stateFunTanh(2){
+LockWavefolder::LockWavefolder(AudioProcessorValueTreeState& vts): stateADAA(2), stateFunADAA(2), stateTanh(2), stateFunTanh(2){
 
     foldParam = vts.getRawParameterValue(FOLDING_ID);
     offsetParam = vts.getRawParameterValue(OFFSET_ID);
@@ -20,15 +20,15 @@ LockWavefolder::LockWavefolder(AudioProcessorValueTreeState& vts): stateADAA(2),
     adaaParam = vts.getRawParameterValue(ADAA_ID);
 
     mixer.setMixingRule(dsp::DryWetMixingRule::linear);
-    foldSmoother.reset(NUM_STEPS);
-    offsetSmoother.reset(NUM_STEPS);
+    foldSmoother.reset(NUM_STEPS_LOCK);
+    offsetSmoother.reset(NUM_STEPS_LOCK);
     setSampleRate(44100.0f);
     setFold(*foldParam);
     setOffset(*offsetParam);
     setMixProportion(*dwParam);
 
-    for (int i = 0; i < 4; ++i) {
-        oversampler[i] = std::make_unique<dsp::Oversampling<float>>(2, i + 1, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false);
+    for (int i = 0; i < 5; ++i) {
+        oversampler[i] = std::make_unique<dsp::Oversampling<float>>(2, i, dsp::Oversampling<float>::filterHalfBandPolyphaseIIR, true, false);
     }
     curOs = (int) *osParam;
     prevOs = curOs;
@@ -46,7 +46,7 @@ void LockWavefolder::createParameterLayout(std::vector<std::unique_ptr<RangedAud
     params.push_back(std::make_unique<AudioParameterFloat>(FOLDING_ID, FOLDING_NAME, NormalisableRange<float>(0, 1, 0.001f), 0.5f));
     params.push_back(std::make_unique<AudioParameterFloat>(OFFSET_ID, OFFSET_NAME, NormalisableRange<float>(0, 1, 0.001f), 0.0f));
     params.push_back(std::make_unique<AudioParameterFloat>(DRYWET_ID, DRYWET_NAME, 0.0f, 1.0f, 0.5f));
-    params.push_back(std::make_unique<AudioParameterChoice>(OV_ID, OV_NAME, StringArray{"2x", "4x", "8x", "16x"}, 0));
+    params.push_back(std::make_unique<AudioParameterChoice>(OV_ID, OV_NAME, StringArray{"1x", "2x", "4x", "8x", "16x"}, 1));
     params.push_back(std::make_unique<AudioParameterChoice>(ADAA_ID, ADAA_NAME, StringArray{"No", "Yes"}, 1));
 }
 
@@ -54,7 +54,7 @@ void LockWavefolder::prepare(const juce::dsp::ProcessSpec &spec){
     setSampleRate((float) spec.sampleRate);
     setNumChannels(spec.numChannels);
     mixer.prepare(spec);
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
         oversampler[i] -> initProcessing((size_t) spec.maximumBlockSize);
     }
     prevOs = curOs;
@@ -88,13 +88,13 @@ void LockWavefolder::reset(){
 }
 
 void LockWavefolder::resetSmootherAndLatency(){
-    foldSmoother.skip(NUM_STEPS);
-    offsetSmoother.reset((int) NUM_STEPS* pow(2, curOs));
+    foldSmoother.skip(NUM_STEPS_LOCK);
+    offsetSmoother.reset(roundToInt(NUM_STEPS_LOCK * powf(2, curOs)));
     mixer.setWetLatency(getLatency());
 }
 
 float LockWavefolder::getLatency() noexcept{
-    float adaaLatency = curADAA ? 0.5f * 5 / oversampler[curOs] -> getOversamplingFactor() : 0.0f;
+    float adaaLatency = curADAA ? 0.5f * 5 / powf(2, oversampler[curOs] -> getOversamplingFactor()) : 0.0f;
     return oversampler[curOs] -> getLatencyInSamples() + adaaLatency;
 }
 
@@ -207,7 +207,7 @@ float LockWavefolder::processSample(float input, size_t channel) noexcept{
 }
 
 void LockWavefolder::releaseResources(){
-    for (int i = 0; i < 4; ++i) {
+    for (int i = 0; i < 5; ++i) {
         oversampler[i]->reset();
     }
 }

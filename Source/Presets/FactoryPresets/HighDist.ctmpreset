@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name = "HighDist">
+    <PARAMETERS>
+        <PARAM id = "trim" value = "1.0" />
+        <PARAM id = "output" value="-1.0"/>
+        <PARAM id = "frequency" value="10000.0"/>
+        <PARAM id = "resonance" value="0.0"/>
+        <PARAM id = "morphing" value="0.564"/>
+        <PARAM id = "folding" value="1.0"/>
+        <PARAM id = "offset" value="1.0"/>
+        <PARAM id = "drywet" value="1.0"/>
+        <PARAM id = "preset" value="1"/>
+    </PARAMETERS>
+</Preset>

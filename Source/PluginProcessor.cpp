@@ -21,7 +21,7 @@ CutTheMoogAudioProcessor::CutTheMoogAudioProcessor()
                        .withOutput ("Output", AudioChannelSet::stereo(), true)
                      #endif
                        ),
-                        treeState(*this, nullptr, "PARAMETERS", createParameterLayout()),
+                        treeState(*this, nullptr, Identifier("PARAMETERS"), createParameterLayout()),
        lockWavefolder(treeState),
        moogCatFilter(treeState)
 #endif
@@ -42,6 +42,7 @@ AudioProcessorValueTreeState::ParameterLayout CutTheMoogAudioProcessor::createPa
     params.push_back (std::make_unique<AudioParameterFloat> (GAIN_ID, GAIN_NAME, -40.0f, 12.0f, -1.0f));
     params.push_back (std::make_unique<AudioParameterFloat> (TRIM_ID, TRIM_NAME, -8.0f, 8.0f, 0.0f));
     params.push_back (std::make_unique<AudioParameterBool> (BYPASS_ID, BYPASS_NAME, true));
+    params.push_back (std::make_unique<AudioParameterInt> (PRESET_ID, PRESET_NAME, 0, MAX_NUM_PRESET, 0));
 
     MoogCat::createParameterLayout(params);
     LockWavefolder::createParameterLayout(params);
@@ -90,26 +91,67 @@ double CutTheMoogAudioProcessor::getTailLengthSeconds() const
 
 int CutTheMoogAudioProcessor::getNumPrograms()
 {
-    return 1;   // NB: some hosts don't cope very well if you tell them there are 0 programs,
-                // so this should be at least 1, even if you're not really implementing programs.
+    return presetManager.getNumPresets();   // NB: some hosts don't cope very well if you tell them there are 0 programs,
+                                            // so this should be at least 1, even if you're not really implementing programs.
 }
 
 int CutTheMoogAudioProcessor::getCurrentProgram()
 {
-    return 0;
+    return (int) *treeState.getRawParameterValue(PRESET_ID);
 }
 
 void CutTheMoogAudioProcessor::setCurrentProgram (int index)
 {
+    if (index > MAX_NUM_PRESET)
+        return;
+
+    auto& presetParam = *treeState.getRawParameterValue(PRESET_ID);
+    if ((int) presetParam == index)
+        return;
+
+    if (presetManager.setPreset(treeState, index)){
+        presetParam = (float) index;
+        presetManager.presetUpdated();
+        updateHostDisplay();
+    }
 }
 
 const String CutTheMoogAudioProcessor::getProgramName (int index)
 {
-    return {};
+    return presetManager.getPresetName(index);
 }
 
 void CutTheMoogAudioProcessor::changeProgramName (int index, const String& newName)
 {
+    ignoreUnused(index, newName);
+}
+
+void CutTheMoogAudioProcessor::getStateInformation(MemoryBlock &destData) {
+
+#if JUCE_IOS
+    auto state = vts.copyState();
+    std::unique_ptr<XmlElement> xml (state.createXml());
+    copyXmlToBinary (*xml, destData);
+#else
+    magicState.getStateInformation (destData);
+#endif
+
+}
+
+void CutTheMoogAudioProcessor::setStateInformation(const void *data, int sizeInBytes) {
+
+#if JUCE_IOS
+    std::unique_ptr<juce::XmlElement> xmlState (getXmlFromBinary (data, sizeInBytes));
+
+    if (xmlState.get() != nullptr)
+        if (xmlState->hasTagName (vts.state.getType()))
+            vts.replaceState (juce::ValueTree::fromXml (*xmlState));
+#else
+    MessageManagerLock mml;
+    magicState.setStateInformation (data, sizeInBytes, getActiveEditor());
+#endif
+    presetManager.presetUpdated();
+
 }
 
 //==============================================================================
@@ -117,6 +159,8 @@ void CutTheMoogAudioProcessor::prepareToPlay (double sampleRate, int samplesPerB
 {
     // Use this method as the place to do any pre-playback
     // initialisation that you need..
+
+    setRateAndBufferSizeDetails(sampleRate, samplesPerBlock);
     
     dsp::ProcessSpec spec;
     spec.sampleRate = sampleRate;
@@ -215,6 +259,7 @@ void CutTheMoogAudioProcessor::initialiseBuilder(foleys::MagicGUIBuilder& builde
     builder.registerFactory ("PowerButton", &PowerButtonItem::factory);
     builder.registerLookAndFeel("Skeuomorphic", std::make_unique<foleys::Skeuomorphic>());
     builder.registerLookAndFeel("MYLNF", std::make_unique<OtherLookAndFeel>());
+    presetManager.registerPresetsComponent(builder);
 }
 
 

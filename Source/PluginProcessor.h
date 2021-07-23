@@ -15,6 +15,9 @@
 #define TRIM_NAME "Trim"
 #define BYPASS_ID "bypass"
 #define BYPASS_NAME "Bypass"
+#define PRESET_ID "preset"
+#define PRESET_NAME "Preset"
+#define MAX_NUM_PRESET 999
 
 #include <JuceHeader.h>
 #include "Processors/MoogCat.h"
@@ -24,6 +27,7 @@
 #include "Processors/GainProcessor.h"
 #include "PowerButton.h"
 #include "OtherLookAndFeel.h"
+#include "Presets/PresetManager.h"
 
 //==============================================================================
 /**
@@ -65,7 +69,13 @@ public:
     const String getProgramName (int index) override;
     void changeProgramName (int index, const String& newName) override;
 
+    void getStateInformation(MemoryBlock& destData) override;
+    void setStateInformation(const void *data, int sizeInBytes) override;
+
     //==============================================================================
+
+    const AudioProcessorValueTreeState& getVts() const { return treeState; }
+    PresetManager& getPresetManager() { return presetManager; }
     
     //==============================================================================
     
@@ -86,6 +96,8 @@ private:
     MoogCat moogCatFilter;
 
     GainProcessor inputGain, outputGain;
+
+    PresetManager presetManager;
 
     AudioProcessorValueTreeState::ParameterLayout createParameterLayout();
     //==============================================================================

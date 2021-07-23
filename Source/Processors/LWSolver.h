@@ -160,4 +160,4 @@ namespace LWSolver{
         const T y = omega3<T> (x);
         return y - (y - exp_approx<T> (x - y)) / (y + (T) 1);
     }
-};
+}

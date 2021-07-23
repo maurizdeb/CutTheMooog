@@ -24,7 +24,7 @@
 #define ADAA_ID "antialiasing"
 #define ADAA_NAME "Antialiasing"
 
-#define NUM_STEPS 2205
+#define NUM_STEPS_LOCK 2205
 
 class LockWavefolder{
     
@@ -61,8 +61,8 @@ public:
     
 private:
   
-    float sampleRate;
-    std::unique_ptr<dsp::Oversampling<float>> oversampler[4];
+    float sampleRate = 44100.f;
+    std::unique_ptr<dsp::Oversampling<float>> oversampler[5];
     
     SmoothedValue<float, ValueSmoothingTypes::Linear> foldSmoother, offsetSmoother;
 
@@ -73,7 +73,7 @@ private:
     std::atomic<float>* dwParam = nullptr;
     std::atomic<float>* osParam = nullptr;
     std::atomic<float>* adaaParam = nullptr;
-    int prevOs = 0, curOs = 0, curADAA = 1, prevADAA = 1;
+    int prevOs = 1, curOs = 1, curADAA = 1, prevADAA = 1;
 
     static constexpr float alpha = 2 * 7.5f / 15;
     static constexpr float alpha_half = alpha / 2;
@@ -81,7 +81,7 @@ private:
     static constexpr float delta = 7.5e+3f * 10e-17f / 0.025864f;
     const float delta_log = LWSolver::log_approx (delta);
     static constexpr float gamma = 0.025864f / (2 * beta);
-    static constexpr float tolerance = 1e-2f;
+    static constexpr float tolerance = 2.5f*1e-2f;
     float sign(float x) { return (0 < x) - (x < 0); }
     std::vector<std::array<float, 4>> stateADAA, stateFunADAA;
     std::vector<float> stateTanh, stateFunTanh;

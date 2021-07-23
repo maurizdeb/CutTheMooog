@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<Preset name = "LowFreqInt">
+    <PARAMETERS>
+        <PARAM id = "trim" value = "0.0" />
+        <PARAM id = "output" value="-1.0"/>
+        <PARAM id = "frequency" value="120.0"/>
+        <PARAM id = "resonance" value="0.91"/>
+        <PARAM id = "morphing" value="0.4"/>
+        <PARAM id = "folding" value="0.8"/>
+        <PARAM id = "offset" value="0.7"/>
+        <PARAM id = "drywet" value="0.9"/>
+        <PARAM id = "preset" value="2"/>
+    </PARAMETERS>
+</Preset>

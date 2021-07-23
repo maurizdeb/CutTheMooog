@@ -71,12 +71,18 @@ add_subdirectory(Source)
 # add plugin binary data files
 juce_add_binary_data(BinaryData
         SOURCES
-            Resources/CutTheMoog.xml
-            Resources/CutTheMoog_logoprova2.png
-            Resources/FuturaBoldFont.ttf
-            Resources/FuturaBookFont.ttf
-            Resources/FuturaHeavyfont.ttf
-            Resources/powerswitch.svg
+        Resources/CutTheMoog.xml
+        Resources/CutTheMoog_logoprova2.png
+        Resources/FuturaBoldFont.ttf
+        Resources/FuturaBookFont.ttf
+        Resources/FuturaHeavyfont.ttf
+        Resources/powerswitch.svg
+        Resources/LeftArrow.svg
+        Resources/RightArrow.svg
+
+        Source/Presets/FactoryPresets/Default.ctmpreset
+        Source/Presets/FactoryPresets/HighDist.ctmpreset
+        Source/Presets/FactoryPresets/LowFreqInt.ctmpreset
 )
 
 target_compile_definitions(CutTheMoog
